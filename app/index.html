@@ -24,18 +24,32 @@
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Voice Teleprompter — read from your phone">
-<meta name="twitter:description" content="Paste a script and read it from your phone. The words follow your voice, wait at the end of every cut, and go back when you say “take that again”.">
 <meta name="twitter:image" content="https://prompter.rivetlabstudio.com/share.png">
 <meta name="theme-color" content="#121110">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Voice Teleprompter">
-<link rel="icon" href="/icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="manifest" href="/site.webmanifest">
 <title>Voice Teleprompter — read from your phone</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=Space+Mono:wght@400;700&family=Atkinson+Hyperlegible:wght@400;700&family=Lexend:wght@400;600&family=Inter:wght@400;600&display=swap">
+<style>
+  /* The typefaces, served from this address rather than from Google (founder,
+     2026-09-18). Every face the settings pane offers has a file here; nothing
+     about who opens this page reaches anyone else. Paths are absolute so the
+     same source works at / , at /app/ and on the bench, which copies these
+     files beside itself. */
+  @font-face{font-family:"Atkinson Hyperlegible";font-style:normal;font-weight:400;font-display:swap;src:url("/assets/atkinson-hyperlegible-latin-400-normal.woff2") format("woff2")}
+  @font-face{font-family:"Atkinson Hyperlegible";font-style:normal;font-weight:700;font-display:swap;src:url("/assets/atkinson-hyperlegible-latin-700-normal.woff2") format("woff2")}
+  @font-face{font-family:"Instrument Sans";font-style:normal;font-weight:400;font-display:swap;src:url("/assets/instrument-sans-latin-400-normal.woff2") format("woff2")}
+  @font-face{font-family:"Instrument Sans";font-style:normal;font-weight:500;font-display:swap;src:url("/assets/instrument-sans-latin-500-normal.woff2") format("woff2")}
+  @font-face{font-family:"Instrument Sans";font-style:normal;font-weight:600;font-display:swap;src:url("/assets/instrument-sans-latin-600-normal.woff2") format("woff2")}
+  @font-face{font-family:"Inter";font-style:normal;font-weight:400;font-display:swap;src:url("/assets/inter-latin-400-normal.woff2") format("woff2")}
+  @font-face{font-family:"Inter";font-style:normal;font-weight:600;font-display:swap;src:url("/assets/inter-latin-600-normal.woff2") format("woff2")}
+  @font-face{font-family:"Lexend";font-style:normal;font-weight:400;font-display:swap;src:url("/assets/lexend-latin-400-normal.woff2") format("woff2")}
+  @font-face{font-family:"Lexend";font-style:normal;font-weight:600;font-display:swap;src:url("/assets/lexend-latin-600-normal.woff2") format("woff2")}
+  @font-face{font-family:"Space Mono";font-style:normal;font-weight:400;font-display:swap;src:url("/assets/space-mono-latin-400-normal.woff2") format("woff2")}
+  @font-face{font-family:"Space Mono";font-style:normal;font-weight:700;font-display:swap;src:url("/assets/space-mono-latin-700-normal.woff2") format("woff2")}
+</style>
 <style>
   /* Rivet Lab's own tokens. Committed dark on purpose: this page sits behind a
      camera during a shoot, where a bright screen is a light source pointed at
@@ -2023,12 +2037,12 @@
     var standalone = (window.navigator.standalone === true) || (window.matchMedia && window.matchMedia("(display-mode: standalone)").matches);
     return { kind:kind, phone:phone, engine:engine, w:w, h:h, tp:tp, standalone:standalone,
              origin: location.protocol + "//" + (location.host || "(local file)"),
-             build: "2026-09-18 04:59 UTC · 3903d47",
+             build: "2026-09-18 07:06 UTC · 01cc2f4",
              label: kind + ", in " + engine + (standalone ? ", added to the home screen" : "")
                     + " · screen " + w + "×" + h
                     + " · loaded from " + location.protocol + "//" + (location.host || "(local file)") };
   }
-  var BUILD = "2026-09-18 04:59 UTC · 3903d47";
+  var BUILD = "2026-09-18 07:06 UTC · 01cc2f4";
   var DEV = device();
   $("deviceLine").textContent = DEV.label + "  ·  build " + BUILD;
   var canRun = preflight();

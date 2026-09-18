@@ -1,261 +1,372 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="color-scheme" content="dark">
-<meta name="description" content="A free teleprompter that follows your voice. The words fill in as you speak, wait at the end of every cut, and go back when you say “take that again”.">
-<link rel="canonical" href="https://prompter.rivetlabstudio.com/">
-<meta name="robots" content="index, follow, max-image-preview:large">
-<meta property="og:type" content="website">
-<meta property="og:site_name" content="Voice Teleprompter">
-<meta property="og:title" content="Voice Teleprompter — a teleprompter that follows your voice">
-<meta property="og:description" content="A free teleprompter that follows your voice. The words fill in as you speak, wait at the end of every cut, and go back when you say “take that again”.">
-<meta property="og:url" content="https://prompter.rivetlabstudio.com/">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <title>Free Voice-Activated Teleprompter | Rivet Lab Studio</title>
+  <meta name="description" content="A free voice-activated teleprompter for filming videos. Your script scrolls as you speak. Restart hands-free and mark keeper takes. No sign-up. Rivet Lab Studio.">
+  <link rel="canonical" href="https://prompter.rivetlabstudio.com/">
+  <meta name="robots" content="index, follow">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Rivet Lab Studio">
+  <meta property="og:title" content="Free Voice-Activated Teleprompter | Rivet Lab Studio">
+  <meta property="og:description" content="A free voice-activated teleprompter for filming videos. Your script scrolls as you speak. Restart hands-free and mark keeper takes. No sign-up. Rivet Lab Studio.">
+  <meta property="og:url" content="https://prompter.rivetlabstudio.com/">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Free Voice-Activated Teleprompter | Rivet Lab Studio">
+  <meta name="twitter:description" content="A free voice-activated teleprompter for filming videos. Your script scrolls as you speak. Restart hands-free and mark keeper takes. No sign-up. Rivet Lab Studio.">
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebApplication", "name": "Voice Teleprompter", "url": "https://prompter.rivetlabstudio.com/", "applicationCategory": "MultimediaApplication", "operatingSystem": "Web browser", "browserRequirements": "Voice following requires browser speech recognition and microphone permission. A set-pace mode is also available.", "description": "A free voice-activated teleprompter for filming videos. Your script scrolls as you speak. Restart hands-free and mark keeper takes. No sign-up. Rivet Lab Studio.", "isAccessibleForFree": true, "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"}, "publisher": {"@type": "Organization", "name": "Rivet Lab Studio", "url": "https://rivetlabstudio.com/"}}</script>
+  <link rel="icon" type="image/svg+xml" href="assets/rivet-mark.svg">
+  <link rel="stylesheet" href="styles.css">
+  <script src="demo.js" defer></script>
 <meta property="og:image" content="https://prompter.rivetlabstudio.com/share.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Voice Teleprompter — a teleprompter that follows your voice">
-<meta name="twitter:description" content="A free teleprompter that follows your voice. The words fill in as you speak, wait at the end of every cut, and go back when you say “take that again”.">
 <meta name="twitter:image" content="https://prompter.rivetlabstudio.com/share.png">
 <meta name="theme-color" content="#121110">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Voice Teleprompter">
-<link rel="icon" href="/icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="manifest" href="/site.webmanifest">
-<script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebApplication", "name": "Voice Teleprompter", "url": "https://prompter.rivetlabstudio.com/", "applicationCategory": "MultimediaApplication", "operatingSystem": "Any browser with speech recognition", "description": "A free teleprompter that follows your voice. The words fill in as you speak, wait at the end of every cut, and go back when you say “take that again”.", "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"}, "featureList": ["Follows your voice — the words fill in as you say them", "Waits at the end of every cut instead of scrolling past you", "Spoken commands, hands free", "Goes back to the top of a cut when you say “take that again”", "Keeps a take log of every attempt", "Mirrors for a teleprompter rig with glass"]}</script>
-<script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Is it free?", "acceptedAnswer": {"@type": "Answer", "text": "Yes, and there is nothing to sign up for. Open the page and paste a script."}}, {"@type": "Question", "name": "Do I need to install anything?", "acceptedAnswer": {"@type": "Answer", "text": "No. It runs in the browser. On a phone you can add it to your home screen, and it then opens full-screen like an app, with no address bar taking up reading room."}}, {"@type": "Question", "name": "What if I do not say it exactly as written?", "acceptedAnswer": {"@type": "Answer", "text": "It keeps up. The matching is on what you mean rather than on the exact words, so a skipped word or a rephrased sentence does not lose your place. If it does lose you, it says so plainly rather than guessing."}}, {"@type": "Question", "name": "Does it record me?", "acceptedAnswer": {"@type": "Answer", "text": "No. It listens to place you in the script and keeps a written log of your takes. No audio and no video is recorded or kept."}}, {"@type": "Question", "name": "Can I use it with a teleprompter rig?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. There is a mirror setting for rigs with glass in front of the lens, which reverses the words so they read correctly in the glass."}}, {"@type": "Question", "name": "What is the take log for?", "acceptedAnswer": {"@type": "Answer", "text": "So you are not scrubbing through footage guessing which attempt was the good one. Every attempt is listed with its clock time and the words you actually said, and the one you marked out loud is marked in the log."}}]}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Is this teleprompter really free?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. Voice Teleprompter is a free tool from Rivet Lab Studio. Voice following, hands-free commands, reading controls, and the take log are all free. Open it in your browser and paste your script. No account or credit card needed."}}, {"@type": "Question", "name": "What’s the best setup for filming?", "acceptedAnswer": {"@type": "Answer", "text": "Start with two devices: one phone or camera to record, and a second phone or tablet for your words. Mount the camera at eye level and put the prompter just behind or beside it. Bring the reading line close to the lens. Set the text size from where you’ll actually stand, then record a short test to check your eyeline and sound."}}, {"@type": "Question", "name": "Can I read and record on the same phone?", "acceptedAnswer": {"@type": "Answer", "text": "This tool is designed to display your script on a separate screen while your phone or camera records. It doesn’t record video or overlay words on your camera app. Use a second phone, tablet, or computer for the prompter so both your script and your camera can stay open."}}, {"@type": "Question", "name": "Should I turn on mirror mode?", "acceptedAnswer": {"@type": "Answer", "text": "Leave it off when you’re reading directly from a phone or tablet. Use mirror mode when your screen is reflected in teleprompter glass. The app can flip the reading view left-to-right or top-to-bottom to suit your rig."}}, {"@type": "Question", "name": "How do I look natural instead of like I’m reading?", "acceptedAnswer": {"@type": "Answer", "text": "Write the way you talk: short sentences, familiar words, and room to breathe. Keep the text column narrow enough that your eyes don’t scan far sideways, and make it large enough to read without leaning in. Rehearse once, then watch a short test take. Adjust the setup to you."}}, {"@type": "Question", "name": "Do I have to read every word exactly?", "acceptedAnswer": {"@type": "Answer", "text": "No. The tracker allows for small changes and skipped words. It still needs enough of your script to recognize your place. For a bigger rewrite, stop and edit your script. A line break starts a new cut, so break your script into moments you can comfortably say in one go."}}, {"@type": "Question", "name": "What if voice following stops or loses my place?", "acceptedAnswer": {"@type": "Answer", "text": "Check that the browser has microphone permission and can hear you from your filming position. Reduce background noise and keep the prompter tab in the foreground. Between cuts, “take that again” gives you a fresh start; mid-take, say “prompter” first. If speech recognition isn’t available, switch to the set-pace mode and choose a comfortable speed."}}, {"@type": "Question", "name": "Which browsers and languages does it support?", "acceptedAnswer": {"@type": "Answer", "text": "Safari on iPhone has been tested on the working prompter. Voice following depends on the browser and device, and the app checks support when you open it. Speech recognition is currently set to US English. Set-pace scrolling is available when voice following isn’t."}}, {"@type": "Question", "name": "Does it choose my best take?", "acceptedAnswer": {"@type": "Answer", "text": "You choose. Say “that’s the one” to mark a keeper. The take log records your marks and times so you can find those moments in your footage. It doesn’t judge your delivery or edit the video. Copy or download the log when you finish."}}, {"@type": "Question", "name": "Where are my script, settings, and take log stored?", "acceptedAnswer": {"@type": "Answer", "text": "Your pasted script and take log are handled in the current browser page; the app doesn’t upload them to Rivet Lab. Reading settings and custom command preferences are saved locally in this browser. There’s no cloud backup or saved script library in this version, so keep your original script and copy or download your take log before refreshing or closing the page. Clearing this site’s browser data removes its saved settings."}}, {"@type": "Question", "name": "What happens to my microphone audio?", "acceptedAnswer": {"@type": "Answer", "text": "Voice following uses your browser’s speech recognition. Depending on support, audio may be processed on your device or sent to the browser provider’s servers. The app shows which route is available and offers an on-device language download when supported. Rivet Lab doesn’t receive or record your microphone audio. The demonstrations on this landing page never use your microphone."}}, {"@type": "Question", "name": "Do I need an internet connection?", "acceptedAnswer": {"@type": "Answer", "text": "Load the tool while you’re online. Server-based speech recognition needs a connection; on-device recognition can work without one after the required language pack is installed, where supported. Set-pace mode doesn’t use speech recognition. This isn’t a downloadable offline app, so check your setup before relying on it without a connection."}}]}</script>
 </head>
 <body>
-<title>Voice Teleprompter — a teleprompter that follows your voice</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap">
-<style>
-  /* The tokens are the app's own, lifted from it at build time (docs/arcs/teleprompter/bench_test.html)
-     so the front door and the tool cannot drift apart on colour. */
-  :root{
-    --ink:#121110; --panel:#1b1a18; --panel-alt:#171614; --well:#0e0d0c;
-    --line:#3b3833; --line-quiet:#262421;
-    --paper:#edebe6; --t2:#bdbab2; --t3:#94918a; --t4:#8a8780; --t5:#5c5952;
-    --said:#46433d; --lime:#c6f53e; --warn:#e0a86b; --kind:#9085e9;
-    --readout:#cebd82; --readout-quiet:#a89557;
-    --mono:"Space Mono",ui-monospace,"SF Mono",Menlo,monospace;
-    --sans:"Instrument Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
-  }
-  /* THE TYPE RAMP, and why it is not the app's. DESIGN.md's ramp is built for
-     the bench — 13.5px body, read at desk distance on a large screen. This page
-     is read once, on a phone, by someone who has never seen it. So it carries
-     its own ramp of FIVE steps, declared here and used by token everywhere
-     below, plus one size that is not type at all: the drawing of the reading
-     face, which imitates the app's own words. Adding a sixth is a decision,
-     not a call-site choice — that is the whole point of naming them. */
-  :root{
-    --f-display:clamp(2.1rem,7vw,3.1rem); --f-h2:1.5rem; --f-lede:1.125rem;
-    --f-body:1rem; --f-micro:.75rem; --f-read:1.3rem;
-    --r:10px; --r-pill:99px;
-  }
-  *{box-sizing:border-box}
-  body{margin:0;background:var(--ink);color:var(--paper);font-family:var(--sans);font-size:var(--f-body);line-height:1.65;-webkit-font-smoothing:antialiased}
-  .wrap{max-width:760px;margin:0 auto;padding:0 20px 90px}
-  a{color:var(--paper)} a:hover{color:var(--lime)}
-  .kicker{font-family:var(--mono);font-size:var(--f-micro);text-transform:uppercase;letter-spacing:.16em;color:var(--kind);margin:0}
+  <svg xmlns="http://www.w3.org/2000/svg" class="icon-library" width="0" height="0" aria-hidden="true" focusable="false">
+  <!-- Landing-page family: 48-unit feature grid, 1.6-unit structural stroke,
+       interrupted frames, inset surfaces, and a colored functional detail.
+       Utility icons use a separate 24-unit optical grid. -->
+  <symbol id="icon-follow" viewBox="0 0 48 48">
+    <g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M28 8h10a3 3 0 0 1 3 3v26a3 3 0 0 1-3 3H28" opacity=".55"/>
+      <path d="M29 16h6m-6 8h6m-6 8h6" opacity=".45"/>
+      <rect x="11" y="7" width="10" height="22" rx="5" fill="var(--icon-accent)" fill-opacity=".10" stroke="var(--icon-accent)"/>
+      <path d="M6 23v1a10 10 0 0 0 20 0v-1M16 34v7m-5 0h10"/>
+      <path d="M15 12v11" stroke="var(--icon-accent)" opacity=".7"/>
+    </g>
+    <circle cx="38" cy="24" r="2" fill="var(--icon-accent)"/>
+  </symbol>
+  <symbol id="icon-restart" viewBox="0 0 48 48">
+    <g fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 18v-6h6" stroke="var(--icon-accent)"/>
+      <path d="M12.4 12.4A17 17 0 1 1 7 29" stroke="var(--icon-accent)"/>
+      <path d="M20 15h9a3 3 0 0 1 3 3v15a3 3 0 0 1-3 3H18a3 3 0 0 1-3-3V22" stroke="currentColor"/>
+      <path d="M20 22h7M20 27h7M20 32h4" stroke="currentColor" opacity=".5"/>
+    </g>
+    <circle cx="7" cy="29" r="2.3" fill="var(--icon-accent)"/>
+  </symbol>
+  <symbol id="icon-keeper" viewBox="0 0 48 48">
+    <g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M7 16v22a3 3 0 0 0 3 3h25" opacity=".4"/>
+      <path d="M30 7H15a3 3 0 0 0-3 3v24a3 3 0 0 0 3 3h21a3 3 0 0 0 3-3V23"/>
+      <path d="M19 25h12m-12 5h7" opacity=".55"/>
+      <path d="m33 5 2.8 5.7 6.3.9-4.5 4.4 1.1 6.3-5.7-3-5.6 3 1-6.3-4.5-4.4 6.3-.9Z" fill="var(--icon-accent)" fill-opacity=".13" stroke="var(--icon-accent)"/>
+    </g>
+  </symbol>
+  <symbol id="icon-next" viewBox="0 0 48 48">
+    <g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M11 11H8a3 3 0 0 0-3 3v20a3 3 0 0 0 3 3h3" opacity=".35"/>
+      <path d="M22 7h15a3 3 0 0 1 3 3v28a3 3 0 0 1-3 3H22a3 3 0 0 1-3-3v-8"/>
+      <path d="M25 31h9m-9 5h5" opacity=".5"/>
+      <path d="M8 21h20m-6-6 6 6-6 6" stroke="var(--icon-accent)" stroke-width="2"/>
+      <path d="M33 16v10" stroke="var(--icon-accent)" opacity=".5"/>
+    </g>
+  </symbol>
+  <symbol id="icon-readability" viewBox="0 0 48 48">
+    <g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M15 7H9a3 3 0 0 0-3 3v28a3 3 0 0 0 3 3h6m18-34h6a3 3 0 0 1 3 3v28a3 3 0 0 1-3 3h-6" opacity=".5"/>
+      <path d="M15 15v-3h18v3M24 12v24m-5 0h10"/>
+      <path d="M11 24h6m-3-3 3 3-3 3m23-3h-6m3-3-3 3 3 3" stroke="var(--icon-accent)"/>
+    </g>
+  </symbol>
+  <symbol id="icon-flexible" viewBox="0 0 48 48">
+    <g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M8 9h32M8 39h32" opacity=".35"/>
+      <path d="M5 24h5l4-10 7 20 6-24 7 24 4-10h5" stroke="var(--icon-accent)"/>
+      <path d="M8 9v3m32-3v3M8 36v3m32-3v3" opacity=".35"/>
+    </g>
+  </symbol>
+  <symbol id="icon-cuts" viewBox="0 0 48 48">
+    <g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="9" y="5" width="30" height="15" rx="3" fill="var(--icon-accent)" fill-opacity=".07"/>
+      <rect x="9" y="29" width="30" height="14" rx="3" opacity=".5"/>
+      <path d="M16 11h16m-16 4h10m-10 20h16m-16 4h10" opacity=".45"/>
+      <path d="M4 24.5h7m5 0h6m5 0h6m5 0h6" stroke="var(--icon-accent)"/>
+    </g>
+  </symbol>
+  <symbol id="icon-paste" viewBox="0 0 48 48">
+    <g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M16 9h-4a3 3 0 0 0-3 3v28a3 3 0 0 0 3 3h24a3 3 0 0 0 3-3V12a3 3 0 0 0-3-3h-4" opacity=".7"/>
+      <rect x="16" y="5" width="16" height="8" rx="2" fill="var(--icon-accent)" fill-opacity=".12" stroke="var(--icon-accent)"/>
+      <path d="M16 22h16m-16 7h16m-16 7h9" opacity=".55"/>
+    </g>
+  </symbol>
+  <symbol id="icon-eyeline" viewBox="0 0 48 48">
+    <g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M5 14V8a3 3 0 0 1 3-3h6m20 0h6a3 3 0 0 1 3 3v6M5 34v6a3 3 0 0 0 3 3h6m20 0h6a3 3 0 0 0 3-3v-6" opacity=".4"/>
+      <path d="M5 24s7-10 19-10 19 10 19 10-7 10-19 10S5 24 5 24Z"/>
+      <circle cx="24" cy="24" r="5" stroke="var(--icon-accent)" fill="var(--icon-accent)" fill-opacity=".12"/>
+    </g>
+    <circle cx="24" cy="24" r="1.5" fill="var(--icon-accent)"/>
+  </symbol>
+  <symbol id="icon-arrow-up-right" viewBox="0 0 24 24"><path d="M6 18 18 6M6 6h12v12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="icon-arrow-down" viewBox="0 0 24 24"><path d="M12 4v16m-6-6 6 6 6-6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="icon-play" viewBox="0 0 24 24"><path d="m8 5 11 7-11 7Z" fill="currentColor" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></symbol>
+  <symbol id="icon-pause" viewBox="0 0 24 24"><path d="M8 5v14M16 5v14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></symbol>
+  <symbol id="icon-plus" viewBox="0 0 24 24"><path d="M5 12h14M12 5v14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
+  <symbol id="icon-replay" viewBox="0 0 24 24"><path d="M5 9a8 8 0 1 1-1 7M5 3v6h6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+</svg>
 
-  header.hero{padding:58px 0 34px}
-  h1{font-size:var(--f-display);line-height:1.04;margin:14px 0 18px;letter-spacing:-.03em;text-wrap:balance;max-width:16ch}
-  .lede{color:var(--t2);font-size:var(--f-lede);margin:0 0 28px;max-width:56ch;text-wrap:pretty}
-  .lede b{color:var(--paper);font-weight:600}
-
-  .cta{display:inline-flex;align-items:center;gap:10px;background:var(--paper);color:var(--ink);border:1px solid var(--paper);border-radius:var(--r);
-       padding:14px 24px;font-family:var(--mono);font-size:var(--f-micro);letter-spacing:.09em;text-transform:uppercase;font-weight:700;text-decoration:none}
-  .cta:hover{background:#fff;color:var(--ink)}
-  .cta:focus-visible{outline:2px solid var(--lime);outline-offset:3px}
-  .under{font-family:var(--mono);font-size:var(--f-micro);letter-spacing:.06em;color:var(--t4);margin:13px 0 0}
-
-  h2{font-size:var(--f-h2);letter-spacing:-.02em;margin:0 0 12px;text-wrap:balance}
-  h3{font-size:var(--f-lede);margin:0 0 6px;letter-spacing:-.01em}
-  section{padding:44px 0;border-top:1px solid var(--line-quiet)}
-  section > p{color:var(--t2);max-width:62ch;margin:0 0 16px}
-
-  /* the drawing: what the words do while you talk */
-  .demo{background:var(--well);border:1px solid var(--line);border-radius:var(--r);padding:26px 22px 22px 30px;margin:0 0 10px}
-  .demo .words{font-size:var(--f-read);line-height:1.5;letter-spacing:-.01em}
-  /* The reading line is a real line under a real row, not a stripe at a typed
-     offset — at a different text size the typed one lands on the wrong words. */
-  .demo .row{padding:3px 0}
-  .demo .row.at{position:relative;border-top:1px solid var(--line);padding-top:9px;margin-top:6px}
-  /* The mark capped rather than rounded by a typed radius: on a 3px bar the
-     pill token gives the same shape the app's own rail has, and the page keeps
-     to the two radii it declared. */
-  .demo .row.at::before{content:"";position:absolute;left:-16px;top:9px;bottom:3px;width:3px;border-radius:var(--r-pill);background:var(--kind)}
-  .demo .said{color:var(--said)} .demo .now{color:var(--lime)} .demo .next{color:var(--paper)} .demo .far{color:var(--t5)}
-  .demo figcaption{font-family:var(--mono);font-size:var(--f-micro);letter-spacing:.06em;color:var(--t4);margin-top:16px;line-height:1.7}
-  .demo figcaption b{color:var(--t3);font-weight:400}
-
-  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));gap:18px;margin-top:6px}
-  .card{background:var(--panel-alt);border:1px solid var(--line-quiet);border-radius:var(--r);padding:18px 19px}
-  .card p{color:var(--t3);margin:0}
-
-  ol.how{counter-reset:s;list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:18px}
-  ol.how li{counter-increment:s;padding-left:46px;position:relative;color:var(--t2);max-width:58ch}
-  ol.how li::before{content:counter(s);position:absolute;left:0;top:-2px;width:30px;height:30px;border-radius:var(--r-pill);border:1px solid var(--line);
-                    display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:var(--f-micro);color:var(--lime)}
-  ol.how b{color:var(--paper)}
-
-  table.says{width:100%;border-collapse:collapse}
-  table.says td{border-bottom:1px solid var(--line-quiet);padding:11px 4px;vertical-align:top;color:var(--t2)}
-  table.says td:first-child{color:var(--paper);white-space:nowrap;padding-right:22px;font-weight:600}
-  table.says tr:last-child td{border-bottom:0}
-
-  table.browsers{width:100%;border-collapse:collapse}
-  table.browsers th{font-family:var(--mono);font-size:var(--f-micro);text-transform:uppercase;letter-spacing:.1em;color:var(--t4);font-weight:400;text-align:left;padding:0 10px 9px 0}
-  table.browsers td{border-top:1px solid var(--line-quiet);padding:11px 10px 11px 0;color:var(--t2);vertical-align:top}
-  table.browsers td:first-child{color:var(--paper)}
-  table.browsers .yes{color:var(--lime)} table.browsers .no{color:var(--warn)}
-
-  /* The receipt for the table above, at the dress ordinary stakes want: the
-     claim leads, the source sits under it rather than beside every row. */
-  .source{font-family:var(--mono);font-size:var(--f-micro);color:var(--t4);line-height:1.7;max-width:62ch;margin:16px 0 0}
-  .faq{display:flex;flex-direction:column;gap:22px}
-  .faq h3{color:var(--paper)} .faq p{color:var(--t2);margin:0;max-width:62ch}
-
-  .end{text-align:center;padding:56px 0 0}
-  footer{border-top:1px solid var(--line-quiet);padding:26px 0 0;color:var(--t4);font-family:var(--mono);font-size:var(--f-micro);letter-spacing:.05em;display:flex;flex-wrap:wrap;gap:14px;justify-content:space-between}
-  footer a{color:var(--t3);text-decoration:none;border-bottom:1px dotted var(--t4)}
-</style>
-
-<div class="wrap">
-
-  <header class="hero">
-    <p class="kicker">free · runs in your browser</p>
-    <h1>The words wait for you.</h1>
-    <p class="lede">A teleprompter that <b>listens</b>. It follows the words as you say them, waits when you stop,
-      and takes you back to the top when you say <b>&ldquo;take that again&rdquo;</b>. No scroll speed to guess at.
-      Free, no sign-up.</p>
-    <a class="cta" href="/app/">Open the teleprompter &rarr;</a>
-    <p class="under">works in your browser &middot; nothing to install &middot; your script never leaves it</p>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header shell">
+    <a class="brand" href="./" aria-label="Rivet Lab · Voice Activated Teleprompter"><svg viewBox="0 0 1820.2046479030787 280" class="brand-lockup" role="img" aria-label="Rivet Lab"><g transform="scale(0.3537765648295555) translate(-115.23 -27.32)"><path d="M 1017.31 635.11 C 1059.32 607.30 1058.00 566.06 1013.78 541.77 C 1008.11 540.96 1002.50 539.14 996.78 539.34 C 940.39 541.37 959.18 590.28 943.04 614.93 C 925.20 642.17 868.68 664.37 837.80 668.17 C 800.42 661.36 797.92 637.90 806.22 603.55 C 819.27 549.55 846.24 494.37 878.83 449.54 C 904.10 431.88 920.30 440.95 941.78 426.35 C 957.48 415.68 963.15 400.59 968.59 383.42 C 970.81 336.16 945.11 307.90 897.08 309.69 C 869.13 319.96 845.56 336.03 842.83 368.65 C 840.77 393.09 857.55 410.85 846.56 435.10 C 827.49 477.16 772.35 537.08 733.64 561.75 C 666.33 586.65 662.02 506.53 660.79 460.45 C 659.14 398.39 665.27 334.33 675.15 273.10 C 678.71 251.08 679.14 226.64 688.76 206.11 C 701.36 179.26 728.04 176.25 745.80 145.15 C 758.05 97.58 744.90 68.43 699.66 48.43 C 655.60 41.03 622.28 63.15 608.96 105.33 C 607.77 123.09 607.44 139.18 618.19 154.61 C 629.21 170.43 642.29 175.69 646.10 196.24 C 652.21 229.12 642.86 265.94 637.50 298.32 C 625.97 368.06 608.30 487.63 556.62 537.80 C 524.11 553.29 506.04 541.76 479.04 521.09 C 432.70 485.60 394.21 417.78 395.46 358.64 C 396.20 324.02 412.96 292.77 409.58 257.53 C 406.84 228.97 394.32 201.83 374.80 180.86 C 281.60 80.76 117.36 171.96 134.81 287.95 C 142.50 339.03 170.92 387.17 220.90 407.10 C 254.41 420.46 284.38 418.14 317.55 439.40 C 398.43 491.22 428.32 585.02 430.01 676.26 C 430.13 682.26 436.32 682.79 441.24 685.21 C 456.11 692.53 470.99 699.85 485.86 707.17 C 549.08 738.28 612.30 769.40 675.52 800.51 C 751.75 762.99 827.98 725.47 904.21 687.96 C 929.78 675.37 947.48 648.36 966.83 640.79 C 982.02 634.85 1001.26 638.37 1017.31 635.11 Z" fill="var(--lime)"/></g><text x="486.2186339170646" y="201.76000000000002" font-size="139.86013986013987" letter-spacing="39.16083916083917" font-family="Zen Dots, sans-serif" fill="currentColor">RIVET LAB</text></svg><span class="studio-label">Voice Activated Teleprompter</span></a>
+    <nav aria-label="Main navigation">
+      <a class="nav-link" href="#how-it-works">How it works</a>
+      <a class="nav-link" href="#questions">Questions</a>
+      <a class="button button-outline nav-cta" href="app/">Use it free <svg class="icon" aria-hidden="true" focusable="false" ><use href="#icon-arrow-up-right"></use></svg></a>
+    </nav>
   </header>
 
-  <figure class="demo">
-    <div class="words">
-      <div class="row said">Everybody told me to validate first. I thought I had.</div>
-      <div class="row at"><span class="said">What I had actually done was</span> <span class="now">ask people</span> <span class="next">whether they liked the idea.</span></div>
-      <div class="row next">Liking an idea costs nothing.</div>
-      <div class="row far">That&rsquo;s the whole lesson, and it took me a quarter to learn it.</div>
+  <main id="main">
+    <section class="hero shell" aria-labelledby="hero-title">
+      <div class="hero-copy">
+        <h1 id="hero-title"><span class="hero-kicker"><span class="free-tag">FREE</span> VOICE-ACTIVATED TELEPROMPTER</span> <span class="hero-headline">Stay in<br>the take<span class="period">.</span></span></h1>
+        <p class="hero-description">Your script, at the speed of you.</p>
+        <p class="hero-body">A free voice-activated teleprompter that scrolls as you speak. Pause, find your words, go again. Keep your eyes on the lens and your hands off the screen.</p>
+        <div class="hero-actions">
+          <a class="button button-primary" href="app/">Open free teleprompter <svg class="icon" aria-hidden="true" focusable="false" ><use href="#icon-arrow-up-right"></use></svg></a>
+          <a class="text-link" href="#demo" id="see-demo">See it in motion <svg class="icon" aria-hidden="true" focusable="false" ><use href="#icon-arrow-down"></use></svg></a>
+        </div>
+        <p class="hero-note"><span class="free-note">Free to use.</span> No sign-up. Just your script.</p>
+      </div>
+
+      <div class="demo-column" id="demo">
+        <div class="demo-caption"><span>THE READING ROOM</span><span>WATCH IT FOLLOW ALONG</span></div>
+        <div class="prompter-preview" id="prompter-preview" data-state="ready">
+          <div class="preview-topline"><span class="preview-name">THE PROMPTER</span><span id="take-counter">CUT 01 / TAKE 01</span></div>
+          <div class="reading-area">
+            <div class="reading-guide" aria-hidden="true"><svg class="reading-cursor icon" aria-hidden="true" focusable="false" ><use href="#icon-play"></use></svg><span class="guide-line"></span></div>
+            <div class="reading-lines" id="reading-lines" aria-label="Example script">
+              <p class="script-pair is-active"><span>You</span> <span>have</span><br><span>something</span> <span>to</span> <span>say.</span></p>
+              <p class="script-pair"><span>Give</span> <span>yourself</span><br><span>room</span> <span>to</span> <span>say</span> <span>it.</span></p>
+              <p class="script-pair"><span>A</span> <span>breath.</span><br><span>Another</span> <span>try.</span></p>
+              <p class="script-pair"><span>A</span> <span>take</span> <span>that</span><br><span>feels</span> <span>like</span> <span>you.</span></p>
+            </div>
+            <div class="cut-rail" aria-hidden="true"><span>01</span><i></i></div>
+          </div>
+          <div class="voice-cue" id="hero-voice-cue" data-kind="reading"><svg class="icon" aria-hidden="true"><use id="hero-cue-icon" href="#icon-follow"></use></svg><div><span id="hero-cue-label">YOUR VOICE LEADS</span><p id="hero-cue-text">The words move with you.</p></div></div>
+          <div class="preview-bottomline">
+            <span class="demo-status" id="demo-status">Voice-following demo</span>
+            <div class="signal-meter" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+          </div>
+          <div class="demo-progress" aria-hidden="true"><span id="demo-progress"></span></div>
+        </div>
+        <div class="demo-controls">
+          <button class="demo-play" id="demo-play" type="button"><svg class="icon" aria-hidden="true" focusable="false" id="demo-play-icon"><use href="#icon-play"></use></svg> <span id="demo-play-label">Play demo</span></button>
+          <button class="icon-button" id="demo-restart" type="button" aria-label="Restart the example" title="Restart the example"><svg class="icon" aria-hidden="true" focusable="false" ><use href="#icon-replay"></use></svg></button>
+          <span class="demo-disclosure">A demonstration. No microphone.</span>
+        </div>
+        <noscript><p class="hero-note">This preview needs JavaScript. The example above shows the reading view.</p></noscript>
+      </div>
+    </section>
+
+    <div class="capability-strip shell" aria-label="Prompter features">
+      <span><svg class="icon capability-icon" aria-hidden="true" focusable="false" ><use href="#icon-follow"></use></svg> Follows your voice</span><span><svg class="icon capability-icon accent-purple" aria-hidden="true" focusable="false" ><use href="#icon-restart"></use></svg> Restarts hands-free</span><span><svg class="icon capability-icon" aria-hidden="true" focusable="false" ><use href="#icon-keeper"></use></svg> Remembers your keepers</span>
+      <a href="#how-it-works" aria-label="Explore how it works"><svg class="icon" aria-hidden="true" focusable="false" ><use href="#icon-arrow-down"></use></svg></a>
     </div>
-    <figcaption><b>What to notice:</b> the line you are saying sits on the mark, and the words light up as you land
-      them &mdash; <span style="color:var(--lime)">&ldquo;ask people&rdquo;</span> has just been said. What you already
-      said stays dim above, so you can pick a sentence back up. What is coming waits below.</figcaption>
-  </figure>
 
-  <section id="how">
-    <h2>How it works</h2>
-    <ol class="how">
-      <li><b>Paste your script.</b> One line per cut &mdash; a cut is one stretch of filming, from starting the camera
-        to stopping it. Press Enter to start a new one.</li>
-      <li><b>Put the phone behind your camera</b> and press start. A countdown gives the microphone time to wake up,
-        so the first word is never the one that gets lost.</li>
-      <li><b>Talk.</b> The words fill in as you say them. At the end of a cut the prompter stops and waits &mdash;
-        it will not run ahead of you while you reset.</li>
-      <li><b>Say what you want next.</b> &ldquo;Take that again&rdquo; goes back to the top of the cut.
-        &ldquo;That&rsquo;s the one&rdquo; marks the take you want to keep. &ldquo;Move on&rdquo; goes to the next cut.</li>
-      <li><b>Take the log with you.</b> Every attempt at every cut, with its clock time and the one you marked, ready
-        to copy into whatever you edit in.</li>
-    </ol>
-  </section>
+    <section class="hands-section shell section-space" id="how-it-works" aria-labelledby="hands-title">
+      <div class="section-heading">
+        <p class="eyebrow">KEEP YOUR PLACE. KEEP YOUR MOMENT.</p>
+        <div class="heading-row"><h2 id="hands-title">The camera’s rolling.<br>Stay right there.</h2><p>A stumbled line shouldn’t mean a walk back to your phone. Just say what you need.</p></div>
+      </div>
+      <div class="command-invitation"><p>Pick a command. Watch the prompter respond.</p><span><svg class="icon" aria-hidden="true"><use href="#icon-play"></use></svg> CLICK TO TRY</span></div>
+      <div class="command-studio">
+        <div class="command-list" role="group" aria-label="Explore the voice commands">
+          <button type="button" class="command-option" data-command="restart" aria-pressed="true" aria-controls="command-result"><svg class="icon command-arrow" aria-hidden="true"><use href="#icon-restart"></use></svg><span class="command-number">01 / RETRY</span><span class="command-quote">“Take that again.”</span><span class="command-description">Back to the start of this cut.<br>Still in position. Still in the moment.</span><span class="command-try">Try it <svg class="icon" aria-hidden="true"><use href="#icon-play"></use></svg></span></button>
+          <button type="button" class="command-option" data-command="keep" aria-pressed="false" aria-controls="command-result"><svg class="icon command-arrow" aria-hidden="true"><use href="#icon-keeper"></use></svg><span class="command-number">02 / KEEP</span><span class="command-quote">“That’s the one.”</span><span class="command-description">Mark the take you liked.<br>Find it in your log when it’s time to edit.</span><span class="command-try">Try it <svg class="icon" aria-hidden="true"><use href="#icon-play"></use></svg></span></button>
+          <button type="button" class="command-option" data-command="next" aria-pressed="false" aria-controls="command-result"><svg class="icon command-arrow" aria-hidden="true"><use href="#icon-next"></use></svg><span class="command-number">03 / NEXT</span><span class="command-quote">“Move on.”</span><span class="command-description">The next cut, ready when you are.<br>One less reason to leave your mark.</span><span class="command-try">Try it <svg class="icon" aria-hidden="true"><use href="#icon-play"></use></svg></span></button>
+        </div>
+        <div class="command-result" id="command-result" data-command-state="restart" data-phase="before">
+          <div class="result-top"><span>WATCH IT HAPPEN</span><button class="demo-play" id="command-play" type="button"><svg class="icon" aria-hidden="true"><use href="#icon-play"></use></svg><span>Play demo</span></button></div>
+          <div class="command-speech"><svg class="icon" aria-hidden="true"><use id="result-icon-use" href="#icon-restart"></use></svg><div><span>YOU SAY</span><p id="result-spoken">“Take that again.”</p></div></div>
+          <div class="command-monitor">
+            <div class="monitor-top"><span>THE PROMPTER</span><span id="result-cut">CUT 01 / TAKE 01</span></div>
+            <div class="mini-reading"><span class="mini-cursor" aria-hidden="true"></span><div class="mini-track" id="mini-track"><p>You have<br>something to say.</p><p>Give yourself<br>room to say it.</p></div></div>
+            <div class="take-log" id="take-log"><span>TAKE LOG</span><div><span id="log-take">01 / TAKE 01</span><span class="log-mark" id="log-mark"><svg class="icon" aria-hidden="true"><use href="#icon-keeper"></use></svg><span id="log-state">In progress</span></span></div></div>
+          </div>
+          <div class="result-explanation"><p class="result-title" id="result-title">Back to your first word.</p><p class="result-detail" id="result-detail">Watch the script rewind for another take.</p></div>
+          <div class="command-demo-footer"><span id="command-step">01 / 03 · RETRY</span><span>Demo · no microphone</span></div>
+          <div class="command-progress" aria-hidden="true"><span id="command-progress"></span></div>
+        </div>
+      </div>
+      <p class="sr-only" id="command-announcement" role="status"></p>
+      <p class="section-footnote">Say these between cuts. Mid-take, put “prompter” first: “Prompter, take that again.”</p>
+    </section>
 
-  <section id="different">
-    <h2>What makes it different</h2>
-    <div class="grid">
-      <div class="card"><h3>It waits at every cut</h3>
-        <p>Most prompters scroll at a speed you set and keep going whether or not you are with them. This one stops
-          where your take stops.</p></div>
-      <div class="card"><h3>A restart is a sentence, not a button</h3>
-        <p>Your hands are on the camera or out of shot. Say &ldquo;take that again&rdquo; and the words go back to
-          the top of the cut.</p></div>
-      <div class="card"><h3>It forgives a paraphrase</h3>
-        <p>Skip a word, swap one, say it your own way &mdash; the words keep up. It is matching what you mean, not
-          waiting for exactly what you wrote.</p></div>
-      <div class="card"><h3>It keeps a take log</h3>
-        <p>Which cut, which attempt, how long, and the one you said to keep. It never scores a take: it cannot see
-          your eyeline or hear the noise outside.</p></div>
-    </div>
-  </section>
+    <section class="rhythm-section" aria-labelledby="rhythm-title">
+      <div class="shell rhythm-grid">
+        <div class="rhythm-copy"><p class="eyebrow">MADE FOR THE WAY YOU SPEAK</p><h2 id="rhythm-title">Leave room<br>for <em>being you.</em></h2><p>A pause for emphasis. A word that comes out differently. A second go at the opening. Your delivery has a rhythm. The prompter follows along.</p><a class="text-link" href="app/">Put your script in <svg class="icon" aria-hidden="true" focusable="false" ><use href="#icon-arrow-up-right"></use></svg></a></div>
+        <div class="feature-rows">
+          <article><span class="feature-symbol" aria-hidden="true"><svg class="icon feature-icon" aria-hidden="true" focusable="false" ><use href="#icon-readability"></use></svg></span><div><h3>Words you can actually read.</h3><p>Set the type, size, spacing, and column width for your eyes and your setup.</p></div></article>
+          <article><span class="feature-symbol" aria-hidden="true"><svg class="icon feature-icon" aria-hidden="true" focusable="false" ><use href="#icon-flexible"></use></svg></span><div><h3>A little room to go off script.</h3><p>Voice following allows for missed or changed words, so a small rewording doesn’t have to become a full restart.</p></div></article>
+          <article><span class="feature-symbol accent-purple" aria-hidden="true"><svg class="icon feature-icon" aria-hidden="true" focusable="false" ><use href="#icon-cuts"></use></svg></span><div><h3>Your script, one cut at a time.</h3><p>Paste your words. Each line break starts a new cut. The prompter holds at the end until you’re ready.</p></div></article>
+          <article><span class="feature-symbol" aria-hidden="true"><svg class="icon feature-icon" aria-hidden="true" focusable="false" ><use href="#icon-keeper"></use></svg></span><div><h3>A record of the ones you liked.</h3><p>Take times and your keeper marks come back in a log. Bring it to the edit and find your way through the footage.</p></div></article>
+        </div>
+      </div>
+    </section>
 
-  <section id="commands">
-    <h2>What you can say</h2>
-    <p>Spoken while you are reading, hands free. Inside a cut, say <b>&ldquo;prompter&rdquo;</b> first &mdash; that
-      is this tool&rsquo;s own name, short &mdash; so your own script is never mistaken for an instruction. Between
-      cuts, the plain words are enough. You can change any of these phrases to your own.</p>
-    <table class="says">
-      <tr><td>&ldquo;take that again&rdquo;</td><td>back to the top of this cut, for another attempt</td></tr>
-      <tr><td>&ldquo;that&rsquo;s the one&rdquo;</td><td>marks the attempt you just did as the keeper</td></tr>
-      <tr><td>&ldquo;move on&rdquo;</td><td>on to the next cut</td></tr>
-      <tr><td>&ldquo;back up&rdquo;</td><td>to the previous cut</td></tr>
-      <tr><td>&ldquo;from the top&rdquo;</td><td>back to the first word of the script</td></tr>
-      <tr><td>&ldquo;that&rsquo;s a wrap&rdquo;</td><td>ends the session and shows the take log</td></tr>
-    </table>
-  </section>
+    <section class="setup-section shell section-space" id="the-setup" aria-labelledby="setup-title">
+      <div class="section-heading"><p class="eyebrow">FROM SCRIPT TO FIRST TAKE</p><h2 id="setup-title">Paste. Place. Speak.</h2></div>
+      <figure class="setup-visual">
+        <div class="setup-drawing">
+          <div class="diagram-heading"><span>THE FILMING SETUP</span><span>FRONT VIEW</span></div>
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 680 450" role="img" aria-labelledby="setup-svg-title setup-svg-desc">
+  <title id="setup-svg-title">Two phones: one for your words, one for the take</title>
+  <desc id="setup-svg-desc">A clean front-view diagram from the creator’s position. An upright phone displays the script behind a horizontal recording phone. The recording phone’s back and three rear camera lenses face the creator. Label one identifies the reading screen; label two identifies the recording phone. Place the reading line close to the recording lens.</desc>
+  <defs>
+    <clipPath id="setup-screen-clip"><rect x="260" y="78" width="157" height="205" rx="3"/></clipPath>
+    <pattern id="setup-grid" x="0" y="0" width="24" height="24" patternUnits="userSpaceOnUse"><circle cx="1" cy="1" r=".65" fill="#3b3833"/></pattern>
+    <linearGradient id="setup-phone-edge" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#94918a"/><stop offset=".5" stop-color="#3b3833"/><stop offset="1" stop-color="#6b675f"/></linearGradient>
+  </defs>
+  <rect width="680" height="450" fill="url(#setup-grid)" opacity=".6"/>
+  <!-- Diagram geometry, not a product photograph: front view, not to scale. -->
+  <g fill="none" stroke="#3b3833" stroke-width="1">
+    <path d="M28 40h12m-6-6v12M640 40h12m-6-6v12M28 412h12m-6-6v12M640 412h12m-6-6v12"/>
+    <path d="M332 22v15m0 370v15" stroke-dasharray="2 4"/>
+  </g>
+  <!-- Second phone: the script display. -->
+  <g>
+    <rect x="246" y="40" width="185" height="331" rx="25" fill="#1b1a18" stroke="url(#setup-phone-edge)" stroke-width="2"/>
+    <rect x="254" y="48" width="169" height="315" rx="19" fill="#0e0d0c" stroke="#262421"/>
+    <path d="M243 100v27m0 12v27m191-49v37" stroke="#5c5952" stroke-width="2" stroke-linecap="round"/>
+    <rect x="318" y="59" width="41" height="6" rx="3" fill="#262421"/>
+    <g clip-path="url(#setup-screen-clip)">
+    <text x="273" y="100" fill="#94918a" font-family="Space Mono,monospace" font-size="9" letter-spacing="1.2">YOUR SCRIPT</text>
+    <text x="273" y="134" fill="#5c5952" font-family="Instrument Sans,sans-serif" font-size="16">You have</text>
+    <text x="273" y="156" fill="#5c5952" font-family="Instrument Sans,sans-serif" font-size="16">something to say.</text>
+    <rect x="261" y="174" width="155" height="59" rx="3" fill="#c6f53e" fill-opacity=".065"/>
+    <path d="m263 185 4 4-4 4" fill="none" stroke="#c6f53e" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="274" y="197" fill="#c6f53e" font-family="Instrument Sans,sans-serif" font-size="18" font-weight="500">Give yourself</text>
+    <text x="274" y="221" fill="#edebe6" font-family="Instrument Sans,sans-serif" font-size="18" font-weight="500">room to speak.</text>
+    <text x="274" y="262" fill="#5c5952" font-family="Instrument Sans,sans-serif" font-size="17">Take a breath.</text>
+    <path d="M414 177v51" stroke="#9085e9" stroke-width="2" stroke-linecap="round"/>
+    </g>
+  </g>
+  <!-- Recording phone, rear view in landscape. Deliberately flat geometry:
+       one chassis, a square camera island, three equal lenses, no hybrid grip. -->
+  <g id="setup-recording-phone">
+    <rect x="180" y="254" width="324" height="156" rx="28" fill="#23211f" stroke="#94918a" stroke-width="1.6"/>
+    <rect x="185" y="259" width="314" height="146" rx="24" fill="none" stroke="#3b3833"/>
+    <path d="M335 251h34m12 0h22" stroke="#6b675f" stroke-width="2" stroke-linecap="round"/>
+    <path d="M346 413h43" stroke="#6b675f" stroke-width="2" stroke-linecap="round"/>
+    <rect x="197" y="271" width="106" height="106" rx="23" fill="#2a2724" stroke="#5c5952" stroke-width="1.2"/>
+    <g fill="#0e0d0c" stroke="#94918a" stroke-width="1.3">
+      <circle cx="224" cy="299" r="20"/>
+      <circle cx="224" cy="349" r="20"/>
+      <circle cx="274" cy="324" r="20"/>
+    </g>
+    <g fill="#171614" stroke="#3b3833" stroke-width="1.2">
+      <circle cx="224" cy="299" r="13"/>
+      <circle cx="224" cy="349" r="13"/>
+      <circle cx="274" cy="324" r="13"/>
+    </g>
+    <g fill="#0e0d0c"><circle cx="224" cy="299" r="7"/><circle cx="224" cy="349" r="7"/><circle cx="274" cy="324" r="7"/></g>
+    <g fill="none" stroke="#9085e9" stroke-width="1.2" stroke-linecap="round" opacity=".6"><path d="M218 291a10 10 0 0 1 8-2M218 341a10 10 0 0 1 8-2M268 316a10 10 0 0 1 8-2"/></g>
+    <circle cx="274" cy="286" r="5" fill="#bdbab2" stroke="#6b675f"/>
+    <circle cx="274" cy="362" r="4" fill="#0e0d0c" stroke="#6b675f"/>
+    <circle cx="290" cy="354" r="1.5" fill="#94918a"/>
+    <path d="M380 325v14m-7-7h14" fill="none" stroke="#3b3833" stroke-width="1.2" stroke-linecap="round"/>
+  </g>
+  <!-- Numbered callouts match the adjacent written explanation. -->
+  <g fill="none" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M431 111h66l26-26h24" stroke="#9085e9" opacity=".7"/>
+    <path d="M180 334h-44l-24 25H85" stroke="#bdbab2" opacity=".65"/>
+    <path d="M442 204h107M516 299h33m-8-95v95" stroke="#c6f53e" opacity=".45" stroke-dasharray="3 5"/>
+    <path d="M537 209l4-5 4 5m-8 85 4 5 4-5" stroke="#c6f53e" opacity=".75"/>
+  </g>
+  <circle cx="431" cy="111" r="2.5" fill="#9085e9"/>
+  <circle cx="180" cy="334" r="2.5" fill="#bdbab2"/>
+  <g font-family="Space Mono,monospace" font-size="12" text-anchor="middle">
+    <circle cx="563" cy="85" r="16" fill="#9085e9" fill-opacity=".09" stroke="#9085e9" stroke-opacity=".6"/>
+    <text x="563" y="89" fill="#9085e9">01</text>
+    <circle cx="69" cy="359" r="16" fill="#1b1a18" stroke="#6b675f"/>
+    <text x="69" y="363" fill="#bdbab2">02</text>
+  </g>
+  <g fill="#c6f53e" font-family="Space Mono,monospace" font-size="10" letter-spacing=".5">
+    <text x="560" y="246">WORDS CLOSE</text><text x="560" y="262">TO THE LENS</text>
+  </g>
+</svg>
 
-  <section id="browsers">
-    <h2>Which browsers can listen</h2>
-    <p>The listening is the browser&rsquo;s own, not ours, so what it can do depends on where you open it. Anywhere
-      it cannot listen, the prompter still prompts &mdash; the words move at a steady pace you set instead.</p>
-    <table class="browsers">
-      <tr><th>Where</th><th>Follows your voice</th><th></th></tr>
-      <tr><td>Chrome or Edge, computer or Android</td><td class="yes">Yes</td><td>Chrome can also keep your voice on the device &mdash; the page asks for it.</td></tr>
-      <tr><td>Safari on iPhone, iPad or Mac</td><td class="yes">Yes</td><td>On an iPhone this is the one to use.</td></tr>
-      <tr><td>Chrome, Firefox or Edge on an iPhone</td><td class="no">No</td><td>Apple makes every iPhone browser use Safari&rsquo;s engine without its recognition. Open it in Safari.</td></tr>
-      <tr><td>Firefox on a computer</td><td class="no">No</td><td>Firefox keeps its speech recognition switched off. The steady pace still works.</td></tr>
-    </table>
-    <p class="source">Which browsers can listen is taken from what each browser&rsquo;s makers document, not from our
-      own testing on every device. The one this has been measured on is an iPhone in Safari.</p>
-  </section>
+        </div>
+        <figcaption class="setup-notes">
+          <h3>Your words.<br>Right by the lens.</h3>
+          <div class="diagram-note"><span class="diagram-number">01</span><div><h4>One phone for your words.</h4><p>The screen faces you. Place it just behind your recording phone, with the reading line close to the lens.</p></div></div>
+          <div class="diagram-note"><span class="diagram-number">02</span><div><h4>One phone for the take.</h4><p>The rear camera faces you. Mount it at eye level and record with your usual camera app.</p></div></div>
+          <p class="diagram-tip">A tablet for the words or a separate camera works too. Keep the words close to the lens and both devices steady.</p>
+        </figcaption>
+      </figure>
+      <div class="setup-steps">
+        <article><div class="step-heading"><span class="step-number">01</span><svg class="icon step-icon" aria-hidden="true" focusable="false" ><use href="#icon-paste"></use></svg></div><h3>Bring your words.</h3><p>Paste a script, or open the sample to get a feel for it. Give each cut its own line.</p></article>
+        <article><div class="step-heading"><span class="step-number">02</span><svg class="icon step-icon" aria-hidden="true" focusable="false" ><use href="#icon-eyeline"></use></svg></div><h3>Find your eyeline.</h3><p>Put the prompter near your camera lens. Adjust the reading view until it feels right.</p></article>
+        <article><div class="step-heading"><span class="step-number">03</span><svg class="icon step-icon" aria-hidden="true" focusable="false" ><use href="#icon-follow"></use></svg></div><h3>Let your voice lead.</h3><p>Allow the microphone, start reading, and record with your usual camera. You set the pace.</p></article>
+      </div>
+    </section>
 
-  <section id="privacy">
-    <h2>Where your words go</h2>
-    <p><b>Your script never leaves your browser.</b> There is no account, no server of ours, and nothing to sign up
-      for &mdash; what you paste is kept on your own device and is still there when you come back.</p>
-    <p>The listening is done by your browser&rsquo;s own speech recognition. In Chrome that normally means the sound
-      of your voice goes to Google to be turned into words, and in Safari to Apple; the page asks Chrome to do it on
-      your device instead wherever it can, and tells you which one you got. We never receive your voice, and nothing
-      is recorded.</p>
-  </section>
+    <section class="faq-section shell" id="questions" aria-labelledby="faq-title">
+      <div class="faq-intro"><p class="eyebrow">BEFORE YOU HIT RECORD</p><h2 id="faq-title">A few good <br>questions.</h2><p class="faq-description">Your setup, your delivery, <br>and what stays on your device.</p><a class="text-link" href="#the-setup">See the setup <svg class="icon" aria-hidden="true"><use href="#icon-arrow-up-right"></use></svg></a></div>
+      <div class="faq-items">
+        <div class="faq-group" aria-labelledby="faq-group-1"><h3 id="faq-group-1"><span>01</span> Getting set up</h3>
+          <details><summary>Is this teleprompter really free?<span aria-hidden="true"><svg class="icon" aria-hidden="true"><use href="#icon-plus"></use></svg></span></summary><p>Yes. Voice Teleprompter is a free tool from Rivet Lab Studio. Voice following, hands-free commands, reading controls, and the take log are all free. Open it in your browser and paste your script. No account or credit card needed.</p></details>
+          <details><summary>What’s the best setup for filming?<span aria-hidden="true"><svg class="icon" aria-hidden="true"><use href="#icon-plus"></use></svg></span></summary><p>Start with two devices: one phone or camera to record, and a second phone or tablet for your words. Mount the camera at eye level and put the prompter just behind or beside it. Bring the reading line close to the lens. Set the text size from where you’ll actually stand, then record a short test to check your eyeline and sound.</p></details>
+          <details><summary>Can I read and record on the same phone?<span aria-hidden="true"><svg class="icon" aria-hidden="true"><use href="#icon-plus"></use></svg></span></summary><p>This tool is designed to display your script on a separate screen while your phone or camera records. It doesn’t record video or overlay words on your camera app. Use a second phone, tablet, or computer for the prompter so both your script and your camera can stay open.</p></details>
+          <details><summary>Should I turn on mirror mode?<span aria-hidden="true"><svg class="icon" aria-hidden="true"><use href="#icon-plus"></use></svg></span></summary><p>Leave it off when you’re reading directly from a phone or tablet. Use mirror mode when your screen is reflected in teleprompter glass. The app can flip the reading view left-to-right or top-to-bottom to suit your rig.</p></details>
+        </div>
+        <div class="faq-group" aria-labelledby="faq-group-2"><h3 id="faq-group-2"><span>02</span> While the camera rolls</h3>
+          <details><summary>How do I look natural instead of like I’m reading?<span aria-hidden="true"><svg class="icon" aria-hidden="true"><use href="#icon-plus"></use></svg></span></summary><p>Write the way you talk: short sentences, familiar words, and room to breathe. Keep the text column narrow enough that your eyes don’t scan far sideways, and make it large enough to read without leaning in. Rehearse once, then watch a short test take. Adjust the setup to you.</p></details>
+          <details><summary>Do I have to read every word exactly?<span aria-hidden="true"><svg class="icon" aria-hidden="true"><use href="#icon-plus"></use></svg></span></summary><p>No. The tracker allows for small changes and skipped words. It still needs enough of your script to recognize your place. For a bigger rewrite, stop and edit your script. A line break starts a new cut, so break your script into moments you can comfortably say in one go.</p></details>
+          <details><summary>What if voice following stops or loses my place?<span aria-hidden="true"><svg class="icon" aria-hidden="true"><use href="#icon-plus"></use></svg></span></summary><p>Check that the browser has microphone permission and can hear you from your filming position. Reduce background noise and keep the prompter tab in the foreground. Between cuts, “take that again” gives you a fresh start; mid-take, say “prompter” first. If speech recognition isn’t available, switch to the set-pace mode and choose a comfortable speed.</p></details>
+          <details><summary>Which browsers and languages does it support?<span aria-hidden="true"><svg class="icon" aria-hidden="true"><use href="#icon-plus"></use></svg></span></summary><p>Safari on iPhone has been tested on the working prompter. Voice following depends on the browser and device, and the app checks support when you open it. Speech recognition is currently set to US English. Set-pace scrolling is available when voice following isn’t.</p></details>
+          <details><summary>Does it choose my best take?<span aria-hidden="true"><svg class="icon" aria-hidden="true"><use href="#icon-plus"></use></svg></span></summary><p>You choose. Say “that’s the one” to mark a keeper. The take log records your marks and times so you can find those moments in your footage. It doesn’t judge your delivery or edit the video. Copy or download the log when you finish.</p></details>
+        </div>
+        <div class="faq-group" aria-labelledby="faq-group-3"><h3 id="faq-group-3"><span>03</span> Your data &amp; privacy</h3>
+          <details><summary>Where are my script, settings, and take log stored?<span aria-hidden="true"><svg class="icon" aria-hidden="true"><use href="#icon-plus"></use></svg></span></summary><p>Your pasted script and take log are handled in the current browser page; the app doesn’t upload them to Rivet Lab. Reading settings and custom command preferences are saved locally in this browser. There’s no cloud backup or saved script library in this version, so keep your original script and copy or download your take log before refreshing or closing the page. Clearing this site’s browser data removes its saved settings.</p></details>
+          <details><summary>What happens to my microphone audio?<span aria-hidden="true"><svg class="icon" aria-hidden="true"><use href="#icon-plus"></use></svg></span></summary><p>Voice following uses your browser’s speech recognition. Depending on support, audio may be processed on your device or sent to the browser provider’s servers. The app shows which route is available and offers an on-device language download when supported. Rivet Lab doesn’t receive or record your microphone audio. The demonstrations on this landing page never use your microphone.</p></details>
+          <details><summary>Do I need an internet connection?<span aria-hidden="true"><svg class="icon" aria-hidden="true"><use href="#icon-plus"></use></svg></span></summary><p>Load the tool while you’re online. Server-based speech recognition needs a connection; on-device recognition can work without one after the required language pack is installed, where supported. Set-pace mode doesn’t use speech recognition. This isn’t a downloadable offline app, so check your setup before relying on it without a connection.</p></details>
+        </div>
+      </div>
+    </section>
 
-  <section id="faq">
-    <h2>Questions</h2>
-    <div class="faq">
-      <div><h3>Is it free?</h3>
-        <p>Yes, and there is nothing to sign up for. Open the page and paste a script.</p></div>
-      <div><h3>Do I need to install anything?</h3>
-        <p>No. It runs in the browser. On a phone you can add it to your home screen, and it then opens full-screen
-          like an app, with no address bar taking up reading room.</p></div>
-      <div><h3>What if I do not say it exactly as written?</h3>
-        <p>It keeps up. The matching is on what you mean rather than on the exact words, so a skipped word or a
-          rephrased sentence does not lose your place. If it does lose you, it says so plainly rather than guessing.</p></div>
-      <div><h3>Does it record me?</h3>
-        <p>No. It listens to place you in the script and keeps a written log of your takes. No audio and no video is
-          recorded or kept.</p></div>
-      <div><h3>Can I use it with a teleprompter rig?</h3>
-        <p>Yes. There is a mirror setting for rigs with glass in front of the lens, which reverses the words so they
-          read correctly in the glass.</p></div>
-      <div><h3>What is the take log for?</h3>
-        <p>So you are not scrubbing through footage guessing which attempt was the good one. Every attempt is listed
-          with its clock time and the words you actually said, and the one you marked out loud is marked in the log.</p></div>
-    </div>
-  </section>
+    <section class="closing-section shell" id="your-next-take" aria-labelledby="closing-title">
+      <div class="closing-rule"><span>YOUR NEXT TAKE</span><span class="free-note">FREE TO USE</span></div>
+      <div class="closing-layout">
+        <div class="closing-copy"><h2 id="closing-title">Your next take.<br>On the house<span class="period">.</span></h2><div class="closing-bottom"><p>Open it. Paste your script. Make it yours.</p><a class="button button-primary" href="app/">Open free teleprompter <svg class="icon" aria-hidden="true"><use href="#icon-arrow-up-right"></use></svg></a></div></div>
+        <div class="closing-countdown" id="closing-countdown" data-count="5" data-beat="a">
+          <p class="countdown-caption">FIVE SECONDS. FIND YOUR MARK.</p>
+          <div class="countdown-stage" aria-hidden="true">
+            <svg class="countdown-dial" viewBox="0 0 320 320" fill="none">
+              <path class="dial-ticks" d="M160 3v14m0 286v14M3 160h14m286 0h14M49 49l10 10m202 202 10 10M49 271l10-10M261 59l10-10"/>
+              <circle class="dial-track" cx="160" cy="160" r="139"/>
+              <circle class="dial-inner" cx="160" cy="160" r="121"/>
+              <circle class="dial-progress" id="countdown-progress" cx="160" cy="160" r="139" pathLength="100" transform="rotate(-90 160 160)"/>
+            </svg>
+            <span class="countdown-number" id="countdown-number">5</span>
+            <span class="countdown-words" id="countdown-words">Find your mark.</span>
+          </div>
+          <p class="sr-only">A five-second countdown gives you time to get in position before reading.</p>
+          <div class="countdown-controls"><span>A LITTLE ROOM BEFORE YOU ROLL</span><button class="demo-play" id="countdown-play" type="button"><svg class="icon" aria-hidden="true"><use href="#icon-play"></use></svg><span>Play animation</span></button></div>
+        </div>
+      </div>
+    </section>
 
-  <div class="end">
-    <a class="cta" href="/app/">Open the teleprompter &rarr;</a>
-    <p class="under">paste a script and press start</p>
-  </div>
+    <section class="studio-invitation shell" id="rivet-lab" aria-labelledby="studio-title">
+      <div class="studio-intro"><p class="eyebrow">A FREE TOOL FROM RIVET LAB STUDIO</p><h2 id="studio-title">There’s more<br>behind a good take.</h2></div>
+      <div class="studio-next"><p>The prompter helps you say it. Rivet Lab helps you figure out what’s worth saying. Study the videos that hold attention, understand what works, and bring those lessons to your next script.</p><a class="text-link studio-link" href="https://rivetlabstudio.com/">Explore Rivet Lab <svg class="icon" aria-hidden="true" focusable="false" ><use href="#icon-arrow-up-right"></use></svg></a></div>
+    </section>
+  </main>
 
-  <footer>
-    <span>Made by Josue Reyes · Rivet Lab Studio</span>
-    <span><a href="/app/">Open the teleprompter</a></span>
-  </footer>
-</div>
-
+  <footer class="site-footer shell"><a href="./" class="brand" aria-label="Rivet Lab Studio home"><svg viewBox="0 0 1820.2046479030787 280" class="brand-lockup" role="img" aria-label="Rivet Lab"><g transform="scale(0.3537765648295555) translate(-115.23 -27.32)"><path d="M 1017.31 635.11 C 1059.32 607.30 1058.00 566.06 1013.78 541.77 C 1008.11 540.96 1002.50 539.14 996.78 539.34 C 940.39 541.37 959.18 590.28 943.04 614.93 C 925.20 642.17 868.68 664.37 837.80 668.17 C 800.42 661.36 797.92 637.90 806.22 603.55 C 819.27 549.55 846.24 494.37 878.83 449.54 C 904.10 431.88 920.30 440.95 941.78 426.35 C 957.48 415.68 963.15 400.59 968.59 383.42 C 970.81 336.16 945.11 307.90 897.08 309.69 C 869.13 319.96 845.56 336.03 842.83 368.65 C 840.77 393.09 857.55 410.85 846.56 435.10 C 827.49 477.16 772.35 537.08 733.64 561.75 C 666.33 586.65 662.02 506.53 660.79 460.45 C 659.14 398.39 665.27 334.33 675.15 273.10 C 678.71 251.08 679.14 226.64 688.76 206.11 C 701.36 179.26 728.04 176.25 745.80 145.15 C 758.05 97.58 744.90 68.43 699.66 48.43 C 655.60 41.03 622.28 63.15 608.96 105.33 C 607.77 123.09 607.44 139.18 618.19 154.61 C 629.21 170.43 642.29 175.69 646.10 196.24 C 652.21 229.12 642.86 265.94 637.50 298.32 C 625.97 368.06 608.30 487.63 556.62 537.80 C 524.11 553.29 506.04 541.76 479.04 521.09 C 432.70 485.60 394.21 417.78 395.46 358.64 C 396.20 324.02 412.96 292.77 409.58 257.53 C 406.84 228.97 394.32 201.83 374.80 180.86 C 281.60 80.76 117.36 171.96 134.81 287.95 C 142.50 339.03 170.92 387.17 220.90 407.10 C 254.41 420.46 284.38 418.14 317.55 439.40 C 398.43 491.22 428.32 585.02 430.01 676.26 C 430.13 682.26 436.32 682.79 441.24 685.21 C 456.11 692.53 470.99 699.85 485.86 707.17 C 549.08 738.28 612.30 769.40 675.52 800.51 C 751.75 762.99 827.98 725.47 904.21 687.96 C 929.78 675.37 947.48 648.36 966.83 640.79 C 982.02 634.85 1001.26 638.37 1017.31 635.11 Z" fill="var(--lime)"/></g><text x="486.2186339170646" y="201.76000000000002" font-size="139.86013986013987" letter-spacing="39.16083916083917" font-family="Zen Dots, sans-serif" fill="currentColor">RIVET LAB</text></svg></a><span>A free tool for the take. By Rivet Lab Studio.</span><a href="#main">Back to top <svg class="icon arrow-up" aria-hidden="true" focusable="false" ><use href="#icon-arrow-down"></use></svg></a></footer>
 </body>
 </html>

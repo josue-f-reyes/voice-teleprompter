@@ -10,7 +10,7 @@
   "theme_color": "#121110",
   "icons": [
     {
-      "src": "/icon.svg",
+      "src": "/assets/rivet-mark.svg",
       "sizes": "any",
       "type": "image/svg+xml"
     },
