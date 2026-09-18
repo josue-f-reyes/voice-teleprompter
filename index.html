@@ -1,0 +1,253 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<meta name="description" content="A free teleprompter that follows your voice. The words fill in as you speak, wait at the end of every cut, and go back when you say “take that again”.">
+<link rel="canonical" href="https://prompter.rivetlabstudio.com/">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Voice Teleprompter">
+<meta property="og:title" content="Voice Teleprompter — a teleprompter that follows your voice">
+<meta property="og:description" content="A free teleprompter that follows your voice. The words fill in as you speak, wait at the end of every cut, and go back when you say “take that again”.">
+<meta property="og:url" content="https://prompter.rivetlabstudio.com/">
+<meta property="og:image" content="https://prompter.rivetlabstudio.com/share.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Voice Teleprompter — a teleprompter that follows your voice">
+<meta name="twitter:description" content="A free teleprompter that follows your voice. The words fill in as you speak, wait at the end of every cut, and go back when you say “take that again”.">
+<meta name="twitter:image" content="https://prompter.rivetlabstudio.com/share.png">
+<meta name="theme-color" content="#121110">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Voice Teleprompter">
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="manifest" href="/site.webmanifest">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebApplication", "name": "Voice Teleprompter", "url": "https://prompter.rivetlabstudio.com/", "applicationCategory": "MultimediaApplication", "operatingSystem": "Any browser with speech recognition", "description": "A free teleprompter that follows your voice. The words fill in as you speak, wait at the end of every cut, and go back when you say “take that again”.", "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"}, "featureList": ["Follows your voice — the words fill in as you say them", "Waits at the end of every cut instead of scrolling past you", "Spoken commands, hands free", "Goes back to the top of a cut when you say “take that again”", "Keeps a take log of every attempt", "Mirrors for a teleprompter rig with glass"]}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Is it free?", "acceptedAnswer": {"@type": "Answer", "text": "Yes, and there is nothing to sign up for. Open the page and paste a script."}}, {"@type": "Question", "name": "Do I need to install anything?", "acceptedAnswer": {"@type": "Answer", "text": "No. It runs in the browser. On a phone you can add it to your home screen, and it then opens full-screen like an app, with no address bar taking up reading room."}}, {"@type": "Question", "name": "What if I do not say it exactly as written?", "acceptedAnswer": {"@type": "Answer", "text": "It keeps up. The matching is on what you mean rather than on the exact words, so a skipped word or a rephrased sentence does not lose your place. If it does lose you, it says so plainly rather than guessing."}}, {"@type": "Question", "name": "Does it record me?", "acceptedAnswer": {"@type": "Answer", "text": "No. It listens to place you in the script and keeps a written log of your takes. No audio and no video is recorded or kept."}}, {"@type": "Question", "name": "Can I use it with a teleprompter rig?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. There is a mirror setting for rigs with glass in front of the lens, which reverses the words so they read correctly in the glass."}}, {"@type": "Question", "name": "What is the take log for?", "acceptedAnswer": {"@type": "Answer", "text": "So you are not scrubbing through footage guessing which attempt was the good one. Every attempt is listed with its clock time and the words you actually said, and the one you marked out loud is marked in the log."}}]}</script>
+</head>
+<body>
+<title>Voice Teleprompter — a teleprompter that follows your voice</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap">
+<style>
+  /* The tokens are the app's own, lifted from it at build time (docs/arcs/teleprompter/bench_test.html)
+     so the front door and the tool cannot drift apart on colour. */
+  :root{
+    --ink:#121110; --panel:#1b1a18; --panel-alt:#171614; --well:#0e0d0c;
+    --line:#3b3833; --line-quiet:#262421;
+    --paper:#edebe6; --t2:#bdbab2; --t3:#94918a; --t4:#8a8780; --t5:#5c5952;
+    --said:#46433d; --lime:#c6f53e; --warn:#e0a86b; --kind:#9085e9;
+    --readout:#cebd82; --readout-quiet:#a89557;
+    --mono:"Space Mono",ui-monospace,"SF Mono",Menlo,monospace;
+    --sans:"Instrument Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+  }
+  /* THE TYPE RAMP, and why it is not the app's. DESIGN.md's ramp is built for
+     the bench — 13.5px body, read at desk distance on a large screen. This page
+     is read once, on a phone, by someone who has never seen it. So it carries
+     its own ramp of FIVE steps, declared here and used by token everywhere
+     below, plus one size that is not type at all: the drawing of the reading
+     face, which imitates the app's own words. Adding a sixth is a decision,
+     not a call-site choice — that is the whole point of naming them. */
+  :root{
+    --f-display:clamp(2.1rem,7vw,3.1rem); --f-h2:1.5rem; --f-lede:1.125rem;
+    --f-body:1rem; --f-micro:.75rem; --f-read:1.3rem;
+    --r:10px; --r-pill:99px;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--ink);color:var(--paper);font-family:var(--sans);font-size:var(--f-body);line-height:1.65;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:760px;margin:0 auto;padding:0 20px 90px}
+  a{color:var(--paper)} a:hover{color:var(--lime)}
+  .kicker{font-family:var(--mono);font-size:var(--f-micro);text-transform:uppercase;letter-spacing:.16em;color:var(--kind);margin:0}
+
+  header.hero{padding:58px 0 34px}
+  h1{font-size:var(--f-display);line-height:1.04;margin:14px 0 18px;letter-spacing:-.03em;text-wrap:balance;max-width:16ch}
+  .lede{color:var(--t2);font-size:var(--f-lede);margin:0 0 28px;max-width:56ch;text-wrap:pretty}
+  .lede b{color:var(--paper);font-weight:600}
+
+  .cta{display:inline-flex;align-items:center;gap:10px;background:var(--paper);color:var(--ink);border:1px solid var(--paper);border-radius:var(--r);
+       padding:14px 24px;font-family:var(--mono);font-size:var(--f-micro);letter-spacing:.09em;text-transform:uppercase;font-weight:700;text-decoration:none}
+  .cta:hover{background:#fff;color:var(--ink)}
+  .cta:focus-visible{outline:2px solid var(--lime);outline-offset:3px}
+  .under{font-family:var(--mono);font-size:var(--f-micro);letter-spacing:.06em;color:var(--t4);margin:13px 0 0}
+
+  h2{font-size:var(--f-h2);letter-spacing:-.02em;margin:0 0 12px;text-wrap:balance}
+  h3{font-size:var(--f-lede);margin:0 0 6px;letter-spacing:-.01em}
+  section{padding:44px 0;border-top:1px solid var(--line-quiet)}
+  section > p{color:var(--t2);max-width:62ch;margin:0 0 16px}
+
+  /* the drawing: what the words do while you talk */
+  .demo{background:var(--well);border:1px solid var(--line);border-radius:var(--r);padding:26px 22px 22px 30px;margin:0 0 10px}
+  .demo .words{font-size:var(--f-read);line-height:1.5;letter-spacing:-.01em}
+  /* The reading line is a real line under a real row, not a stripe at a typed
+     offset — at a different text size the typed one lands on the wrong words. */
+  .demo .row{padding:3px 0}
+  .demo .row.at{position:relative;border-top:1px solid var(--line);padding-top:9px;margin-top:6px}
+  .demo .row.at::before{content:"";position:absolute;left:-16px;top:9px;bottom:3px;width:3px;border-radius:2px;background:var(--kind)}
+  .demo .said{color:var(--said)} .demo .now{color:var(--lime)} .demo .next{color:var(--paper)} .demo .far{color:var(--t5)}
+  .demo figcaption{font-family:var(--mono);font-size:var(--f-micro);letter-spacing:.06em;color:var(--t4);margin-top:16px;line-height:1.7}
+  .demo figcaption b{color:var(--t3);font-weight:400}
+
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));gap:18px;margin-top:6px}
+  .card{background:var(--panel-alt);border:1px solid var(--line-quiet);border-radius:var(--r);padding:18px 19px}
+  .card p{color:var(--t3);margin:0}
+
+  ol.how{counter-reset:s;list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:18px}
+  ol.how li{counter-increment:s;padding-left:46px;position:relative;color:var(--t2);max-width:58ch}
+  ol.how li::before{content:counter(s);position:absolute;left:0;top:-2px;width:30px;height:30px;border-radius:var(--r-pill);border:1px solid var(--line);
+                    display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:var(--f-micro);color:var(--lime)}
+  ol.how b{color:var(--paper)}
+
+  table.says{width:100%;border-collapse:collapse}
+  table.says td{border-bottom:1px solid var(--line-quiet);padding:11px 4px;vertical-align:top;color:var(--t2)}
+  table.says td:first-child{color:var(--paper);white-space:nowrap;padding-right:22px;font-weight:600}
+  table.says tr:last-child td{border-bottom:0}
+
+  table.browsers{width:100%;border-collapse:collapse}
+  table.browsers th{font-family:var(--mono);font-size:var(--f-micro);text-transform:uppercase;letter-spacing:.1em;color:var(--t4);font-weight:400;text-align:left;padding:0 10px 9px 0}
+  table.browsers td{border-top:1px solid var(--line-quiet);padding:11px 10px 11px 0;color:var(--t2);vertical-align:top}
+  table.browsers td:first-child{color:var(--paper)}
+  table.browsers .yes{color:var(--lime)} table.browsers .no{color:var(--warn)}
+
+  .faq{display:flex;flex-direction:column;gap:22px}
+  .faq h3{color:var(--paper)} .faq p{color:var(--t2);margin:0;max-width:62ch}
+
+  .end{text-align:center;padding:56px 0 0}
+  footer{border-top:1px solid var(--line-quiet);padding:26px 0 0;color:var(--t4);font-family:var(--mono);font-size:var(--f-micro);letter-spacing:.05em;display:flex;flex-wrap:wrap;gap:14px;justify-content:space-between}
+  footer a{color:var(--t3);text-decoration:none;border-bottom:1px dotted var(--t4)}
+</style>
+
+<div class="wrap">
+
+  <header class="hero">
+    <p class="kicker">free · runs in your browser</p>
+    <h1>The words wait for you.</h1>
+    <p class="lede">A teleprompter that <b>listens</b>. It follows the words as you say them, holds at the end of
+      every cut until you are ready, and takes you back to the top when you say <b>&ldquo;take that again&rdquo;</b>.
+      No scroll speed to guess at. Free, no sign-up.</p>
+    <a class="cta" href="/app/">Open the teleprompter &rarr;</a>
+    <p class="under">works in your browser &middot; nothing to install &middot; your script never leaves it</p>
+  </header>
+
+  <figure class="demo">
+    <div class="words">
+      <div class="row said">Everybody told me to validate first. I thought I had.</div>
+      <div class="row at"><span class="said">What I had actually done was</span> <span class="now">ask people</span> <span class="next">whether they liked the idea.</span></div>
+      <div class="row next">Liking an idea costs nothing.</div>
+      <div class="row far">That&rsquo;s the whole lesson, and it took me a quarter to learn it.</div>
+    </div>
+    <figcaption><b>What to notice:</b> the line you are saying sits on the mark, and the words light up as you land
+      them &mdash; <span style="color:var(--lime)">&ldquo;ask people&rdquo;</span> has just been said. What you already
+      said stays dim above, so you can pick a sentence back up. What is coming waits below.</figcaption>
+  </figure>
+
+  <section id="how">
+    <h2>How it works</h2>
+    <ol class="how">
+      <li><b>Paste your script.</b> One line per cut &mdash; a cut is one stretch of filming, from starting the camera
+        to stopping it. Press Enter to start a new one.</li>
+      <li><b>Put the phone behind your camera</b> and press start. A countdown gives the microphone time to wake up,
+        so the first word is never the one that gets lost.</li>
+      <li><b>Talk.</b> The words fill in as you say them. At the end of a cut the prompter stops and waits &mdash;
+        it will not run ahead of you while you reset.</li>
+      <li><b>Say what you want next.</b> &ldquo;Take that again&rdquo; goes back to the top of the cut.
+        &ldquo;That&rsquo;s the one&rdquo; marks the take you want to keep. &ldquo;Move on&rdquo; goes to the next cut.</li>
+      <li><b>Take the log with you.</b> Every attempt at every cut, with its clock time and the one you marked, ready
+        to copy into whatever you edit in.</li>
+    </ol>
+  </section>
+
+  <section id="different">
+    <h2>What makes it different</h2>
+    <div class="grid">
+      <div class="card"><h3>It waits at every cut</h3>
+        <p>Most prompters scroll at a speed you set and keep going whether or not you are with them. This one stops
+          where your take stops.</p></div>
+      <div class="card"><h3>A restart is a sentence, not a button</h3>
+        <p>Your hands are on the camera or out of shot. Say &ldquo;take that again&rdquo; and the words go back to
+          the top of the cut.</p></div>
+      <div class="card"><h3>It forgives a paraphrase</h3>
+        <p>Skip a word, swap one, say it your own way &mdash; the words keep up. It is matching what you mean, not
+          waiting for exactly what you wrote.</p></div>
+      <div class="card"><h3>It keeps a take log</h3>
+        <p>Which cut, which attempt, how long, and the one you said to keep. It never scores a take: it cannot see
+          your eyeline or hear the noise outside.</p></div>
+    </div>
+  </section>
+
+  <section id="commands">
+    <h2>What you can say</h2>
+    <p>Spoken while you are reading, hands free. Inside a cut, say <b>&ldquo;prompter&rdquo;</b> first so your own
+      script is never mistaken for an instruction. Between cuts, the plain words are enough. You can change any of
+      these phrases to your own.</p>
+    <table class="says">
+      <tr><td>&ldquo;take that again&rdquo;</td><td>back to the top of this cut, for another attempt</td></tr>
+      <tr><td>&ldquo;that&rsquo;s the one&rdquo;</td><td>marks the attempt you just did as the keeper</td></tr>
+      <tr><td>&ldquo;move on&rdquo;</td><td>on to the next cut</td></tr>
+      <tr><td>&ldquo;back up&rdquo;</td><td>to the previous cut</td></tr>
+      <tr><td>&ldquo;from the top&rdquo;</td><td>back to the first word of the script</td></tr>
+      <tr><td>&ldquo;that&rsquo;s a wrap&rdquo;</td><td>ends the session and shows the take log</td></tr>
+    </table>
+  </section>
+
+  <section id="browsers">
+    <h2>Which browsers can listen</h2>
+    <p>The listening is the browser&rsquo;s own, not ours, so what it can do depends on where you open it. Anywhere
+      it cannot listen, the prompter still prompts &mdash; the words move at a steady pace you set instead.</p>
+    <table class="browsers">
+      <tr><th>Where</th><th>Follows your voice</th><th></th></tr>
+      <tr><td>Chrome or Edge, computer or Android</td><td class="yes">Yes</td><td>Chrome can also keep your voice on the device &mdash; the page asks for it.</td></tr>
+      <tr><td>Safari on iPhone, iPad or Mac</td><td class="yes">Yes</td><td>On an iPhone this is the one to use.</td></tr>
+      <tr><td>Chrome, Firefox or Edge on an iPhone</td><td class="no">No</td><td>Apple makes every iPhone browser use Safari&rsquo;s engine without its recognition. Open it in Safari.</td></tr>
+      <tr><td>Firefox on a computer</td><td class="no">No</td><td>Firefox keeps its speech recognition switched off. The steady pace still works.</td></tr>
+    </table>
+  </section>
+
+  <section id="privacy">
+    <h2>Where your words go</h2>
+    <p><b>Your script never leaves your browser.</b> There is no account, no server of ours, and nothing to sign up
+      for &mdash; what you paste is kept on your own device and is still there when you come back.</p>
+    <p>The listening is done by your browser&rsquo;s own speech recognition. In Chrome that normally means the sound
+      of your voice goes to Google to be turned into words, and in Safari to Apple; the page asks Chrome to do it on
+      your device instead wherever it can, and tells you which one you got. We never receive your voice, and nothing
+      is recorded.</p>
+  </section>
+
+  <section id="faq">
+    <h2>Questions</h2>
+    <div class="faq">
+      <div><h3>Is it free?</h3>
+        <p>Yes, and there is nothing to sign up for. Open the page and paste a script.</p></div>
+      <div><h3>Do I need to install anything?</h3>
+        <p>No. It runs in the browser. On a phone you can add it to your home screen, and it then opens full-screen
+          like an app, with no address bar taking up reading room.</p></div>
+      <div><h3>What if I do not say it exactly as written?</h3>
+        <p>It keeps up. The matching is on what you mean rather than on the exact words, so a skipped word or a
+          rephrased sentence does not lose your place. If it does lose you, it says so plainly rather than guessing.</p></div>
+      <div><h3>Does it record me?</h3>
+        <p>No. It listens to place you in the script and keeps a written log of your takes. No audio and no video is
+          recorded or kept.</p></div>
+      <div><h3>Can I use it with a teleprompter rig?</h3>
+        <p>Yes. There is a mirror setting for rigs with glass in front of the lens, which reverses the words so they
+          read correctly in the glass.</p></div>
+      <div><h3>What is the take log for?</h3>
+        <p>So you are not scrubbing through footage guessing which attempt was the good one. Every attempt is listed
+          with its clock time and the words you actually said, and the one you marked out loud is marked in the log.</p></div>
+    </div>
+  </section>
+
+  <div class="end">
+    <a class="cta" href="/app/">Open the teleprompter &rarr;</a>
+    <p class="under">paste a script and press start</p>
+  </div>
+
+  <footer>
+    <span>Made by Josue Reyes · Rivet Lab Studio</span>
+    <span><a href="/app/">Open the teleprompter</a></span>
+  </footer>
+</div>
+
+</body>
+</html>

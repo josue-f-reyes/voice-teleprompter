@@ -1,0 +1,23 @@
+{
+  "name": "Voice Teleprompter",
+  "short_name": "Prompter",
+  "description": "A free teleprompter that follows your voice. The words fill in as you speak, wait at the end of every cut, and go back when you say “take that again”.",
+  "start_url": "/app/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#121110",
+  "theme_color": "#121110",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    },
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    }
+  ]
+}

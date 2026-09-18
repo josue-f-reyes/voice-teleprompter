@@ -1,0 +1,2494 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<meta name="referrer" content="no-referrer">
+<style>
+  html{-webkit-text-size-adjust:100%}
+  body{margin:0}
+  img{max-width:100%}
+  [hidden]{display:none!important}
+  details.maker{display:none!important}
+</style>
+<meta name="description" content="Paste a script and read it from your phone. The words follow your voice, wait at the end of every cut, and go back when you say “take that again”.">
+<link rel="canonical" href="https://prompter.rivetlabstudio.com/app/">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Voice Teleprompter">
+<meta property="og:title" content="Voice Teleprompter — read from your phone">
+<meta property="og:description" content="Paste a script and read it from your phone. The words follow your voice, wait at the end of every cut, and go back when you say “take that again”.">
+<meta property="og:url" content="https://prompter.rivetlabstudio.com/app/">
+<meta property="og:image" content="https://prompter.rivetlabstudio.com/share.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Voice Teleprompter — read from your phone">
+<meta name="twitter:description" content="Paste a script and read it from your phone. The words follow your voice, wait at the end of every cut, and go back when you say “take that again”.">
+<meta name="twitter:image" content="https://prompter.rivetlabstudio.com/share.png">
+<meta name="theme-color" content="#121110">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Voice Teleprompter">
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="manifest" href="/site.webmanifest">
+<title>Voice Teleprompter — read from your phone</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=Space+Mono:wght@400;700&family=Atkinson+Hyperlegible:wght@400;700&family=Lexend:wght@400;600&family=Inter:wght@400;600&display=swap">
+<style>
+  /* Rivet Lab's own tokens. Committed dark on purpose: this page sits behind a
+     camera during a shoot, where a bright screen is a light source pointed at
+     the set. Single theme, every colour explicit. */
+  :root{
+    --ink:#121110; --panel:#1b1a18; --panel-alt:#171614; --well:#0e0d0c;
+    --line:#3b3833; --line-quiet:#262421;
+    --paper:#edebe6; --t2:#bdbab2; --t3:#94918a; --t4:#8a8780; --t5:#5c5952;
+    --said:#46433d; --lime:#c6f53e; --warn:#e0a86b; --kind:#9085e9;
+    --readout:#cebd82; --readout-quiet:#a89557;
+    --mono:"Space Mono",ui-monospace,"SF Mono",Menlo,monospace;
+    --sans:"Instrument Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--ink);color:var(--paper);font-family:var(--sans);line-height:1.6;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:720px;margin:0 auto;padding:28px 20px 80px;display:flex;flex-direction:column;gap:22px}
+
+  .kicker{font-family:var(--mono);font-size:.64rem;text-transform:uppercase;letter-spacing:.16em;color:var(--kind);margin:0}
+  h1{font-size:1.75rem;line-height:1.1;margin:6px 0 14px;letter-spacing:-.025em;text-wrap:balance}
+  .stand{color:var(--t2);margin:0;max-width:62ch}
+
+  .panel{background:var(--panel-alt);border:1px solid var(--line-quiet);border-radius:10px;padding:16px 18px}
+  .panel h2{font-family:var(--mono);font-size:.66rem;text-transform:uppercase;letter-spacing:.14em;color:var(--t4);font-weight:400;margin:0 0 12px}
+
+  ol.steps{margin:0;padding-left:1.25rem;color:var(--t2);display:flex;flex-direction:column;gap:7px;font-size:.92rem}
+  ol.steps b{color:var(--paper);font-weight:600}
+
+  .controls{display:flex;flex-wrap:wrap;gap:9px;align-items:center}
+  button{font-family:var(--mono);font-size:.72rem;letter-spacing:.09em;text-transform:uppercase;padding:10px 16px;border-radius:7px;border:1px solid var(--line);background:transparent;color:var(--t2);cursor:pointer}
+  button:hover:not(:disabled){color:var(--paper);border-color:var(--t3)}
+  button:focus-visible{outline:2px solid var(--lime);outline-offset:2px}
+  button:disabled{opacity:.4;cursor:not-allowed}
+  /* The primary: the paper fill, one per screen, as the design system's Button rules.
+     Lime is kept for the RUNNING state alone — only lime moves. */
+  button.go{background:var(--paper);color:var(--ink);border-color:var(--paper);font-weight:700}
+  button.go:hover:not(:disabled){background:#fff;color:var(--ink);border-color:#fff}
+  button.go[data-live="1"]{background:var(--lime);border-color:var(--lime);color:#14160a;font-weight:700}
+
+  /* ---- the prompter face: what he was, what he is on, what is coming ---- */
+  .stage{background:#000;border:1px solid var(--line);border-radius:12px;padding:20px 18px;height:62vh;min-height:320px;overflow-y:auto;position:relative}
+  .stage[data-mode="sweep"]{overflow:hidden}
+  /* MIRROR (founder, 2026-09-17): a beam-splitter's glass reverses the screen,
+     so the page draws it reversed and it reads right in the glass. Left–right
+     is the usual; up–down when the phone sits the other way round in its tray.
+     Applied to the whole stage, and lifted for the instant a measurement is read. */
+  .stage[data-mirror="x"]{transform:scaleX(-1)} .stage[data-mirror="y"]{transform:scaleY(-1)}
+  .stage[data-measuring="1"]{transform:none!important}
+  .stage[data-mode="sweep"] #script{transition:transform .46s cubic-bezier(.33,1,.68,1);will-change:transform;backface-visibility:hidden}
+  .stage[data-mode="sweep"] #script.snap{transition:none}
+  /* In sweep mode NOTHING may disturb the line rhythm: no cut margins, no
+     block labels. The cut number lives in a pinned chip, outside the flow. */
+  .stage[data-mode="sweep"] .cut{margin:0}
+  .stage[data-mode="sweep"] .cutmark{display:none}
+  .stage[data-mode="sweep"] #cutchip{display:block}
+  #cmdflash{position:absolute;left:50%;transform:translateX(-50%);bottom:14px;z-index:4;opacity:0;
+    transition:opacity .2s ease;font-family:var(--mono);font-size:.68rem;letter-spacing:.12em;
+    text-transform:uppercase;color:var(--lime);border:1px solid var(--lime);border-radius:99px;padding:5px 12px;
+    background:rgba(0,0,0,.72);pointer-events:none}
+  #cutchip{display:none;position:absolute;top:6px;left:50%;transform:translateX(-50%);z-index:3;
+    font-family:var(--mono);font-size:.54rem;letter-spacing:.16em;text-transform:uppercase;
+    color:var(--t5);background:rgba(0,0,0,.85);border:1px solid var(--line-quiet);
+    border-radius:99px;padding:3px 9px;transition:color .25s ease,border-color .25s ease}
+  #cutchip[data-end="near"]{color:var(--kind);border-color:var(--kind)}
+  /* THE GAP STRIP (2026-09-17). Between takes his eyes are free, so the band
+     above the reading line — where finished lines already fade to black —
+     says what just happened at READING size, and what he can say. It is
+     hidden the moment he reads: nothing may sit near the reading line then.
+     The old chip measured 8.6px against 32px words; from his mark that is
+     not a label, it is a smudge. */
+  #gap{display:none;position:absolute;left:18px;right:18px;top:0;z-index:3;background:#000;padding:6px 0 4px}
+  .stage[data-gap="1"] #gap{display:block}
+  .stage[data-gap="1"] #cutchip{display:none}
+  #gap .what{font-family:var(--sans);font-weight:600;letter-spacing:-.012em;color:var(--readout);line-height:1.2;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;transition:color .25s ease}
+  /* Ruled 2026-09-17 (G-1): the strip wears the rail's purple while a command
+     is accepted, so the two read as one signal — "it is time for the
+     commands" — and lime once a take is kept. */
+  #gap[data-tone="command"] .what{color:var(--kind)}
+  #gap[data-tone="command"] .say{color:var(--kind);opacity:.72}
+  #gap[data-kept="1"] .what{color:var(--lime)}
+  /* The pause that ends a cut whose last word never arrived, drawn as it runs
+     down (founder, 2026-09-17: "a visual indicator with time decreasing").
+     Under the pair, purple, full width when the hold lands. */
+  #pause{position:absolute;left:18px;right:18px;height:3px;background:var(--kind);border-radius:2px;z-index:2;opacity:0;
+    transform:scaleX(0);transform-origin:left center;transition:transform .4s linear,opacity .2s ease;pointer-events:none}
+  #pause[data-on="1"]{opacity:.9}
+  #gap .say{font-family:var(--sans);font-size:16px;line-height:1.5;color:var(--t3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}
+  #gap .say q{color:var(--t2);quotes:"“" "”"}
+  #gap .say[data-kind="heard"]{color:var(--warn)}
+  /* At the end of the script the whole vocabulary rides past, right to left,
+     so every phrase can be seen from his mark (founder, 2026-09-17: "a little
+     marquee moving in a smooth right-to-left motion so that I could see all
+     the commands"). Two copies of the list, moved by half, loop seamlessly. */
+  #gap .say.marquee{text-overflow:clip}
+  #gap .say.marquee > span{display:inline-block;white-space:nowrap;padding-right:3em;animation:marq var(--marq,24s) linear infinite}
+  @keyframes marq{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+  @media (prefers-reduced-motion: reduce){#gap .say.marquee > span{animation:none}}
+  #gap .say[data-kind="done"]{color:var(--lime)}
+  /* THE FOOT LINE (ruled 2026-09-17, F-7/F-8): the one persistent message the
+     face may carry mid-take, at the foot where the flash already lives, never
+     over the words. Orange, the warn colour, used nowhere else on the face. */
+  #foot{display:none;position:absolute;left:50%;transform:translateX(-50%);bottom:12px;z-index:4;
+    font-family:var(--mono);font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;color:var(--warn);
+    border:1px solid var(--warn);border-radius:99px;padding:5px 12px;background:rgba(0,0,0,.72);white-space:nowrap;max-width:94%;overflow:hidden;text-overflow:ellipsis}
+  .stage[data-foot="1"] #foot{display:block}
+  .stage[data-foot="1"] #cmdflash{display:none}
+  /* THE COUNTDOWN (ruled 2026-09-17, F-4): a fixed five seconds, a switch in
+     the settings. The listener is started with it, so the start is spent
+     walking to the mark. One number, the strip's purple: not yet a take. */
+  #count{display:none;position:absolute;inset:0;z-index:5;background:#000;align-items:center;justify-content:center;flex-direction:column;gap:10px}
+  .stage[data-count="1"] #count{display:flex}
+  #count .n{font-family:var(--sans);font-weight:600;color:var(--kind);line-height:1;letter-spacing:-.02em}
+  #count .w{font-family:var(--sans);color:var(--t3);font-size:16px;text-align:center}
+  /* A cut with a kept take wears it on its cap, whether or not he is in it. */
+  .rail[data-kept="1"] .cap{background:var(--paper);opacity:1}
+  /* THE VISION AREA (founder, 2026-09-16): two rules, one at the top of each
+     line of the live pair. This is the box his eyes are meant to stay inside,
+     and every sweep is measured against it. */
+  .guide{display:none;position:absolute;left:0;right:0;height:1px;pointer-events:none;z-index:2;
+    background:linear-gradient(90deg,transparent,rgba(198,245,62,.34),transparent)}
+  .stage[data-mode="sweep"] .guide{display:block}
+  .stage[data-mode="sweep"] .guide[data-g="2"]{background:linear-gradient(90deg,transparent,rgba(198,245,62,.18),transparent)}
+  .stage[data-mode="sweep"] .guide[data-g="end"]{background:linear-gradient(90deg,transparent,rgba(198,245,62,.10),transparent)}
+  .sent{display:block;margin:0}
+  .stage[data-mode="sweep"] .sent{transition:opacity .26s ease}
+  /* In sweep mode the cut-level colours are off: hierarchy is the line band's
+     job, and a cut that dims its own words fights the band. */
+  .stage[data-mode="sweep"] .cut,
+  .stage[data-mode="sweep"] .cut[data-rel] { color:#efece6 }
+  .stage[data-mode="sweep"] .cut w{transition:color .12s linear,opacity .3s ease}
+  .stage[data-mode="sweep"] .cut[data-rel] w{color:#efece6}
+  .stage[data-mode="sweep"] .cut[data-rel] w.said{color:#8e8a81}
+  .stage[data-mode="sweep"] .cut[data-rel] w.now{color:var(--lime);text-shadow:0 0 14px rgba(198,245,62,.45)}
+  /* Already swept past: dimmer than what is coming, and still legible —
+     "light enough for me to see it" (founder, 2026-09-16). */
+  .stage[data-mode="sweep"] .cut w.above{opacity:.45}
+  /* The live pair sits in the band; the reading line marks its top edge. */
+  /* A rail down the right edge marking each cut's extent, riding with the text.
+     The founder: "I don't really have a sense of cuts. I don't know when I would
+     be able to tell the prompter to restart… I could see a visual indicator on
+     the right side, maybe the use of color." */
+  #script{position:relative}
+  .rail{position:absolute;right:-13px;width:5px;border-radius:3px;background:#3a3732;
+    transition:background .3s ease,box-shadow .3s ease,width .25s ease,right .25s ease}
+  /* Colour is set in markRails(): three states, decided there, painted there. */
+  /* The end of every cut is marked whether or not he is in it, so he can see it
+     coming rather than discover it. */
+  .rail .cap{position:absolute;left:-7px;right:-7px;bottom:-1px;height:4px;border-radius:2px;background:var(--kind);opacity:.5}
+  .rail[data-cut="now"] .cap{opacity:1}
+  .rail::before{content:"";position:absolute;left:-4px;right:-4px;top:0;height:3px;border-radius:2px;background:inherit}
+  .stage[data-mode="sweep"] .cut w.rewound{animation:rw .75s ease-out}
+  @keyframes rw{0%{background:rgba(198,245,62,.32)}100%{background:transparent}}
+  #topfade{display:none;position:absolute;left:0;right:0;top:0;z-index:2;pointer-events:none;
+    background:linear-gradient(180deg,#000 0%,#000 38%,rgba(0,0,0,.72) 72%,rgba(0,0,0,0) 100%)}
+  .stage[data-mode="sweep"] #topfade{display:block}
+  #vision{display:none;position:absolute;left:0;right:0;pointer-events:none;z-index:1;
+    background:linear-gradient(180deg,rgba(198,245,62,.05),rgba(198,245,62,.015))}
+  .stage[data-mode="sweep"] #vision{display:block}
+  @media (prefers-reduced-motion: reduce){.stage[data-mode="sweep"] #script{transition:none}}
+  .lens{font-family:var(--mono);font-size:.56rem;letter-spacing:.18em;color:var(--t5);text-transform:uppercase;text-align:center;margin:0 0 16px}
+  /* The words' own knobs (founder, 2026-09-17): a typeface chosen for
+     legibility, a little more air between lines, a little more between
+     letters — "not too much, nothing crazy". All three change where words
+     land, so every change re-measures the layout. */
+  .stage{--face-font:var(--sans);--face-lh:1.38;--face-ls:-.012em}
+  .cut{font-family:var(--face-font);font-size:2rem;line-height:var(--face-lh);font-weight:600;letter-spacing:var(--face-ls);margin:0 0 22px;color:var(--said);transition:color .18s ease}
+  .stage[data-face="atkinson"]{--face-font:"Atkinson Hyperlegible",var(--sans)} .stage[data-face="lexend"]{--face-font:"Lexend",var(--sans)} .stage[data-face="inter"]{--face-font:"Inter",var(--sans)}
+  .cut[data-rel="past"]{color:#2d2b27}
+  .cut[data-rel="next"]{color:#4e4a43}
+  .cut[data-rel="far"]{color:#312f2b}
+  .cut[data-rel="now"]{color:var(--paper)}
+  .cut w{transition:color .1s linear}
+  .cut[data-rel="now"] w{color:#efece6}
+  .cut[data-rel="now"] w.said{color:var(--said)}
+  .cut[data-rel="now"] w.now{color:var(--lime)}
+  .cutmark{display:block;font-family:var(--mono);font-size:.55rem;letter-spacing:.16em;color:var(--t5);text-transform:uppercase;margin-bottom:5px;font-weight:400}
+
+  /* ---- the readout ---- */
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(138px,1fr));gap:1px;background:var(--line-quiet);border:1px solid var(--line-quiet);border-radius:8px;overflow:hidden}
+  .cell{background:var(--well);padding:11px 13px}
+  .cell dt{font-family:var(--mono);font-size:.58rem;text-transform:uppercase;letter-spacing:.13em;color:var(--t4);margin:0 0 4px}
+  .cell dd{margin:0;font-family:var(--mono);font-size:1.2rem;font-weight:700;color:var(--paper);font-variant-numeric:tabular-nums}
+  .cell dd small{font-size:.66rem;font-weight:400;color:var(--t4);letter-spacing:.06em}
+  .cell[data-flag="bad"] dd{color:var(--warn)}
+  .cell[data-flag="good"] dd{color:var(--lime)}
+
+  .verdict{display:flex;flex-direction:column;gap:9px}
+  .v{display:flex;gap:11px;align-items:flex-start;font-size:.93rem;color:var(--t2)}
+  .v i{flex:0 0 auto;font-family:var(--mono);font-style:normal;font-size:.7rem;letter-spacing:.1em;padding:2px 7px;border-radius:99px;border:1px solid var(--line);color:var(--t4);margin-top:2px}
+  .v[data-k="ok"] i{border-color:var(--lime);color:var(--lime)}
+  .v[data-k="bad"] i{border-color:var(--warn);color:var(--warn)}
+  .v b{color:var(--paper);font-weight:600}
+
+  textarea{width:100%;background:var(--well);color:var(--paper);border:1px solid var(--line-quiet);border-radius:7px;padding:14px 15px;font-family:var(--sans);font-size:1rem;min-height:92px;resize:vertical;line-height:1.55}
+  textarea:focus-visible{outline:2px solid var(--lime);outline-offset:2px;border-color:var(--line)}
+  .screen[data-for="paste"] header{margin-bottom:8px} .screen[data-for="paste"] #src{min-height:38vh;margin-top:18px}
+  .screen[data-for="paste"] .stand{font-size:1.02rem}
+  label.fld{display:block;font-family:var(--mono);font-size:.62rem;text-transform:uppercase;letter-spacing:.13em;color:var(--t4);margin-bottom:6px}
+  .hint{font-family:var(--mono);font-size:.64rem;color:var(--t4);letter-spacing:.05em;margin:7px 0 0}
+  .row{display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+  .row input[type=range]{flex:1 1 140px;accent-color:var(--lime);height:28px;margin:0}
+  .log{font-family:var(--mono);font-size:.7rem;color:var(--t3);background:var(--well);border:1px solid var(--line-quiet);border-radius:7px;padding:11px 13px;max-height:220px;overflow-y:auto;white-space:pre-wrap;line-height:1.7}
+  @media (prefers-reduced-motion: reduce){*{transition:none!important}}
+
+  /* ---- the flow (built 2026-09-17 off the face sheet's rulings) ---- */
+  .screen{display:none} #app[data-screen="paste"] .screen[data-for="paste"],#app[data-screen="check"] .screen[data-for="check"],
+  #app[data-screen="read"] .screen[data-for="read"],#app[data-screen="end"] .screen[data-for="end"]{display:block}
+  #app:not([data-screen="check"]):not([data-screen="read"]) #stage,#app:not([data-screen="check"]) #fit{display:none}
+  #app[data-screen="read"]{padding-top:10px;gap:10px} #app[data-screen="read"] .stage{height:calc(100dvh - 78px);min-height:320px}
+  #app[data-screen="check"] .stage{height:58vh}
+  /* S-1 (ruled 2026-09-17): while the pane is open the stage shrinks to the top
+     half, so the reading line and its pair stay visible above the sliders. */
+  #app[data-pane="1"][data-screen="check"] .stage{height:calc(50vh - 84px)}
+  #app[data-pane="1"] .screen[data-for="check"] .checklist,#app[data-pane="1"] .screen[data-for="check"] #startHint,#app[data-pane="1"] #go{display:none}
+  .bar{display:flex;justify-content:space-between;align-items:center;gap:10px} .bar button{padding:8px 12px;display:inline-flex;align-items:center;gap:6px}
+  .bar .chev-l{width:14px;height:14px;flex:0 0 auto}
+  /* The screens' rhythm: the bar sits close to the stage; the list and the primary get room. */
+  #app[data-screen="check"]{gap:12px} #app[data-screen="check"] #counts{margin-top:8px}
+  #app[data-screen="check"] .screen[data-for="check"]:last-of-type{display:flex;flex-direction:column;gap:12px}
+  #app[data-screen="check"] .screen[data-for="check"]:last-of-type .controls{margin-top:12px}
+  #app[data-screen="end"] .screen[data-for="end"] header{margin-bottom:10px}
+  .counts{font-family:var(--mono);font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--t3)}
+  .checklist{display:flex;flex-direction:column;gap:6px}
+  table.takes{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:.72rem;line-height:1.45}
+  table.takes th{font-size:.6rem;letter-spacing:.12em;text-transform:uppercase;color:var(--t4);font-weight:400;text-align:left;padding:0 8px 6px 0}
+  table.takes td{padding:7px 8px 7px 0;border-top:1px solid var(--line-quiet);vertical-align:top;color:var(--t2);white-space:nowrap}
+  table.takes td.how{white-space:normal;color:var(--paper);width:100%} table.takes .tk{color:var(--t4)} table.takes tr.kept td{color:var(--paper)} table.takes .star{color:var(--lime)}
+  .cutrow{display:flex;gap:12px;align-items:baseline;font-size:.9rem;color:var(--t2);border-bottom:1px solid var(--line-quiet);padding:6px 0}
+  .cutrow .n{font-family:var(--mono);font-size:.68rem;color:var(--t4);min-width:1.6em} .cutrow .t{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--paper)}
+  .cutrow .c{font-family:var(--mono);font-size:.68rem;color:var(--readout-quiet);white-space:nowrap}
+  .warnline{margin:0;padding:11px 14px;border:1px solid var(--warn);border-radius:8px;color:var(--warn);font-size:.86rem;line-height:1.5}
+  #door:empty{display:none} #door .v{margin-bottom:12px}
+  /* The microphone sentence (P-5, ruled 2026-09-17). It sits under the paste
+     box, on the first screen, before anything has been pressed — and it is
+     DERIVED from what the browser granted, never typed, so it cannot claim
+     the device while the audio goes to a server (Bug Class #4). */
+  .privacy{margin:16px 0 0;padding-left:12px;border-left:3px solid var(--line);color:var(--t3);font-size:.88rem;line-height:1.6;max-width:62ch}
+  .privacy b{color:var(--t2);font-weight:600}
+  .privacy button{margin-top:9px}
+  #pane{position:fixed;left:0;right:0;bottom:0;max-height:50vh;overflow-y:auto;overflow-x:hidden;background:var(--panel);border-top:1px solid var(--line);
+    border-radius:14px 14px 0 0;padding:14px 18px 40px;z-index:30;box-shadow:0 -12px 40px rgba(0,0,0,.6)}
+  #pane[hidden]{display:none}
+  /* Four sizes (S-4), and the pane's spacing scale: 4 · 8 · 12 · 24. Rows sit
+     tight (8), a section head gets more above it than below (24 / 8), the
+     door that explains a section is its quiet last row. */
+  #pane{--p-title:20px;--p-body:12.5px;--p-small:10.5px;--s1:4px;--s2:8px;--s3:12px;--s4:24px}
+  #pane .bar{margin-bottom:var(--s1)} #pane .bar b{font-size:var(--p-title);font-weight:600;letter-spacing:-.015em}
+  #pane .bar button{padding:8px 14px}
+  #pane>.hint{margin:0 0 var(--s1)}
+  #pane button{font-size:var(--p-body);padding:8px 14px} #pane .hint{font-size:var(--p-small);color:var(--t4);letter-spacing:.02em}
+  /* THE HEAD is the pane's one strong device (bolder, 2026-09-17): the same
+     sans, the same weight the script words wear, in paper — no whisper. */
+  #pane .ph{font-family:var(--sans);font-size:14px;text-transform:none;letter-spacing:-.01em;color:var(--paper);font-weight:600;margin:var(--s4) 0 var(--s2)}
+  /* A setting row: label · control · value, on one grid so every slider
+     starts and ends on the same line. Labels in the reader's words (sans);
+     values in mono, because they are measurements — and the value is the
+     thing being set, so it carries the weight. */
+  #pane .row{display:grid;grid-template-columns:8.5em minmax(0,1fr) auto;gap:var(--s3);align-items:center;flex-wrap:nowrap;margin:0}
+  #pane .row+.row{margin-top:var(--s2)}
+  /* A switch row adapts (founder, 2026-09-17: "it needs to work excellently on
+     mobile"): the label leads, the control sits at the right edge, and a control
+     too wide to sit beside its label — the four typefaces at 402px, three mirrors
+     at 375 — drops to its own line at full width instead of pushing the pane
+     sideways. A joined group may wrap its buttons on the narrowest phones. */
+  #pane .row.stack{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px 12px}
+  #pane .row.stack .lbl{flex:1 1 8.5em} #pane .row.stack>:last-child{flex:0 1 auto;max-width:100%;margin-left:auto}
+  #pane .row.stack+.row.stack,#pane details.dd+.row{margin-top:var(--s3)}
+  #pane .lbl{font-family:var(--sans);font-size:var(--p-body);letter-spacing:0;text-transform:none;color:var(--t2);min-width:0}
+  #pane .val{font-family:var(--mono);font-size:var(--p-body);color:var(--paper);font-weight:700;min-width:5.6em;text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+  #pane .sub{grid-column:2/-1;font-family:var(--mono);font-size:var(--p-small);color:var(--t4);margin-top:calc(-1 * var(--s1))}
+  #pane .row input[type=range]{height:28px;margin:0;min-width:0}
+  .phrase{display:grid;grid-template-columns:max-content 1fr 1fr;gap:8px 10px;align-items:center;margin-bottom:8px}
+  .phrase .does{font-size:var(--p-body);color:var(--t3);grid-column:1/-1;margin:-4px 0 2px}
+  .phrase .lbl{min-width:7em} .phrase input{background:var(--well);color:var(--paper);border:1px solid var(--line-quiet);border-radius:6px;padding:7px 9px;font-family:var(--sans);font-size:var(--p-body);min-width:0}
+  .phrase input[data-bad="1"]{border-color:var(--warn);color:var(--warn)} .phrase .why{grid-column:1/-1;font-family:var(--mono);font-size:var(--p-small);color:var(--warn);margin:-4px 0 4px}
+  .seg{display:inline-flex;flex-wrap:wrap;max-width:100%;overflow:hidden;border-radius:99px;border:1px solid var(--line-quiet)} .seg button{flex:1 1 auto} #pane .seg button{border:0;border-radius:0;padding:11px 14px;font-family:var(--sans);text-transform:none;letter-spacing:0;white-space:nowrap} .seg button+button{border-left:1px solid var(--line-quiet)} .seg button[aria-pressed="true"]{background:var(--panel-alt);color:var(--paper)}
+  /* THE DROPDOWN (S-2, ruled 2026-09-17: "an actual dropdown … clear as day. None of
+     that little subtle design"). One component for the phrases, each section's
+     explanation, and the maker's fold: a full-width bar, the label at body size
+     in paper, a drawn chevron that turns when open. */
+  details.dd{border:1px solid var(--line);border-radius:8px;background:var(--well);margin:var(--s3,12px) 0 0;--p-body:12.5px;--p-small:10.5px}
+  details.dd>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:10px;padding:12px 14px;min-height:44px;font-family:var(--sans);font-size:var(--p-body);font-weight:600;color:var(--paper);border-radius:8px}
+  details.dd>summary:focus-visible{outline:2px solid var(--lime);outline-offset:2px}
+  details.dd>summary::-webkit-details-marker{display:none}
+  details.dd>summary .chev{flex:0 0 auto;width:16px;height:16px;transition:transform .2s ease} details.dd[open]>summary .chev{transform:rotate(180deg)}
+  details.dd>summary .cnt{margin-left:auto;font-family:var(--mono);font-size:var(--p-small);font-weight:400;color:var(--t3);letter-spacing:.06em}
+  details.dd>.dd-body{padding:4px 14px 14px;border-top:1px solid var(--line-quiet)}
+  details.dd.why{background:transparent;border-color:var(--line-quiet)} details.dd.why>summary{min-height:40px;padding:9px 14px;font-weight:500;color:var(--t3)}
+  details.maker{border:1px solid var(--line-quiet);border-radius:8px;padding:8px 12px;margin-top:22px} details.maker summary{cursor:pointer;font-family:var(--mono);font-size:.66rem;letter-spacing:.13em;text-transform:uppercase;color:var(--t4);padding:6px 0;min-height:28px}
+</style>
+
+</head>
+<body>
+<div class="wrap" id="app" data-screen="paste">
+
+  <!-- ==================================================== the paste (F-2) -->
+  <section class="screen" data-for="paste">
+    <header>
+      <h1>Paste your script</h1>
+      <p class="stand">Put this phone behind your camera and read from it. The words move as you say them, wait at the
+        end of each cut, and go back when you say <b>“take that again”</b>. <b>Press Enter to start a new cut</b> — a cut is
+        one stretch of filming, from starting the camera to stopping it.</p>
+    </header>
+    <div id="door"></div>
+    <textarea id="src" spellcheck="false" placeholder="Paste your script here. Press Enter to start a new cut."></textarea>
+    <p class="controls" style="margin-top:11px"><button id="load" class="go">See it as you’ll read it</button>
+      <button id="sample">Use the sample script</button></p>
+    <p id="privacy" class="privacy"></p>
+  </section>
+
+  <!-- ==================================================== the check (F-3) -->
+  <section class="screen" data-for="check">
+    <div class="bar"><button id="back"><svg class="chev-l" viewBox="0 0 16 16" aria-hidden="true"><path d="M10 3L5 8l5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Edit script</button><button id="gear">Settings</button></div>
+  </section>
+
+  <!-- ==================================================== the read -->
+  <section class="screen" data-for="read">
+    <div class="bar" style="justify-content:flex-end"><button id="stopbtn">Stop</button></div>
+  </section>
+
+  <p id="fit" style="display:none;margin:0;padding:11px 14px;border:1px solid var(--warn);border-radius:8px;
+     color:var(--warn);font-size:.86rem;line-height:1.5"></p>
+
+  <section id="stage" class="stage" aria-live="off">
+    <span id="cutchip"></span>
+    <span id="cmdflash"></span>
+    <span id="foot"></span>
+    <div id="count"><div class="n">5</div><div class="w">walk to where you will stand</div></div>
+    <div id="gap"><div class="what"></div><div class="say"></div></div>
+    <div id="vision"></div>
+    <div id="pause"></div>
+    <div id="topfade"></div>
+    <div class="guide" data-g="1" id="g1"></div>
+    <div class="guide" data-g="2" id="g2"></div>
+    <div class="guide" data-g="end" id="g3"></div>
+    <p class="lens">↑ the lens is up here ↑</p>
+    <div id="script"></div>
+  </section>
+
+  <section class="screen" data-for="check">
+    <p id="counts" class="counts" style="margin:0 0 8px"></p>
+    <div id="checklist" class="checklist"></div>
+    <p id="awake" class="warnline" style="display:none"></p>
+    <p class="controls"><button id="go" class="go">Start reading</button></p>
+    <p class="hint" id="startHint">Press Start, then walk to where you’ll stand; the words appear after a five-second count.
+      At the end of each cut it waits for you: say <b>“take that again”</b> to redo it, <b>“that’s the one”</b> to mark it as the
+      keeper, or <b>“move on”</b> to continue. Mid-cut, say <b>“prompter”</b> first: “prompter, take that again”.</p>
+    <p id="micline" class="warnline" style="display:none"></p>
+  </section>
+
+  <!-- ==================================================== the end (F-11) -->
+  <section class="screen" data-for="end">
+    <header>
+      <h1 id="endTitle">Session ended</h1>
+    </header>
+    <div class="log" id="endlog" style="max-height:none;white-space:normal"></div>
+    <p class="hint">One row per attempt at a cut, with the time it started, so you can jump straight to it in your footage.
+      The log records what happened and never picks a best take — that is yours to judge. It cannot yet hear loudness, pace,
+      pauses or background noise.</p>
+    <p class="controls" style="margin-top:20px"><button id="copyall" class="go">Copy the log</button>
+      <button id="download">Download</button>
+      <button id="share">Share…</button></p>
+    <p class="controls" style="margin-top:28px"><button id="again">Read it again</button><button id="newscript">New script</button></p>
+    <details class="dd maker" style="margin-top:28px"><summary><svg class="chev" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 6l5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>What goes in the copy<span class="cnt">for the maker</span></summary><div class="dd-body">
+      <p class="row" style="gap:16px;font-family:var(--mono);font-size:.7rem;color:var(--t2);margin:10px 0;display:flex">
+        <label><input type="checkbox" id="inc_takes" checked> the take log</label>
+        <label><input type="checkbox" id="inc_result" checked> the result</label>
+        <label><input type="checkbox" id="inc_layout" checked> the layout + every sweep</label>
+        <label><input type="checkbox" id="inc_events" checked> the raw events</label></p>
+      <div class="log" id="out">nothing measured yet</div>
+    </div></details>
+  </section>
+
+  <!-- ==================================================== the settings pane (F-13) -->
+  <div id="pane" hidden>
+    <div class="bar"><b>Settings</b><button id="paneclose">Done</button></div>
+    <p class="hint">Saved on this device, so they stay the same for every script.</p>
+
+    <h2 class="ph">How it looks</h2>
+    <div class="row">
+      <span class="lbl">Text size</span>
+      <input type="range" id="size" min="0.9" max="3.2" step="0.05" value="2.00" aria-label="text size">
+      <span id="sizeOut" class="val">2.00×</span>
+    </div>
+    <div class="row">
+      <span class="lbl">Line width</span>
+      <input type="range" id="width" min="14" max="46" step="1" value="30" aria-label="column width in characters">
+      <span id="widthOut" class="val">30 letters</span>
+    </div>
+    <div class="row stack"><span class="lbl">Typeface</span><span class="seg" role="group" aria-label="the words' typeface"><button id="face-default" aria-pressed="true">Instrument</button><button id="face-atkinson" aria-pressed="false">Atkinson</button><button id="face-lexend" aria-pressed="false">Lexend</button><button id="face-inter" aria-pressed="false">Inter</button></span></div>
+    <div class="row">
+      <span class="lbl">Line spacing</span>
+      <input type="range" id="lh" min="1.2" max="1.7" step="0.02" value="1.38" aria-label="space between lines">
+      <span id="lhOut" class="val">1.38</span>
+    </div>
+    <div class="row">
+      <span class="lbl">Letter spacing</span>
+      <input type="range" id="ls" min="-0.02" max="0.06" step="0.005" value="-0.012" aria-label="space between letters">
+      <span id="lsOut" class="val">−0.012</span>
+    </div>
+    <div class="row stack"><span class="lbl">Mirror</span><span class="seg" role="group" aria-label="mirror the screen for a glass teleprompter"><button id="mirror-off" aria-pressed="true">Off</button><button id="mirror-x" aria-pressed="false">Left–right</button><button id="mirror-y" aria-pressed="false">Up–down</button></span></div>
+    <div class="row">
+      <span class="lbl">Reading line</span>
+      <input type="range" id="readline" min="18" max="45" step="1" value="30" aria-label="how far down the screen the reading line sits">
+      <span id="readlineOut" class="val">30% down</span>
+    </div>
+    <details class="dd why"><summary><svg class="chev" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 6l5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>What this does</summary><div class="dd-body"><p class="hint">Set these for how far you stand from the phone. Text size and line width decide how big the words are and how many fit on a line. Typeface: Instrument is the page's own; Atkinson Hyperlegible was drawn by the Braille Institute so every letter looks unlike every other; Lexend was built from reading-speed research; Inter is made for screens. Line spacing and letter spacing add a little air — a touch more can help at a distance. Mirror is for a teleprompter with glass in front of the lens: the glass reverses the screen, so the words are drawn reversed and read right in the glass — left–right is the usual; up–down if your phone sits the other way round in its tray. The reading line is the fixed spot where the line you are saying sits: higher keeps your eyes nearer the camera; lower keeps more of what you just said in view.</p></div></details>
+
+    <h2 class="ph">How it moves</h2>
+    <div class="row">
+      <span class="lbl">Run ahead</span>
+      <input type="range" id="lead" min="1" max="4" step="1" value="2" aria-label="how many words the fill runs ahead">
+      <span id="leadOut" class="val">2 words</span>
+      <span class="sub">grey: heard · green: about here</span>
+    </div>
+    <details class="dd why"><summary><svg class="chev" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 6l5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>What this does</summary><div class="dd-body"><p class="hint">The phone hears each word a moment after you say it. Grey words are the ones it has heard; the green band is where you probably are, this many words ahead. If the green runs ahead of your mouth, turn it down one. Style: the words slide up two lines at a time, or the whole cut holds still. Countdown: five seconds after Start, time to walk to where you will stand. Follow: your voice moves the words and the spoken commands work; or a set speed moves them on their own, the voice is off, and a tap pauses — it still waits at the end of each cut for a tap.</p></div></details>
+    <div class="row stack"><span class="lbl">Style</span><span class="seg" role="group" aria-label="how the words move"><button id="mode-sweep" aria-pressed="true">Slide two lines</button><button id="mode-held" aria-pressed="false">Hold still</button></span></div>
+    <div class="row stack"><span class="lbl">Countdown</span><button id="countdown" aria-pressed="true">On · 5 seconds</button></div>
+    <div class="row stack"><span class="lbl">Follow</span><span class="seg" role="group" aria-label="what moves the words"><button id="follow-voice" aria-pressed="true">My voice</button><button id="follow-timed" aria-pressed="false">A set speed</button></span></div>
+    <div class="row" id="wpsRow" hidden>
+      <span class="lbl">Speed</span>
+      <input type="range" id="wps" min="0.8" max="4" step="0.1" value="2.0" aria-label="words a second">
+      <span id="wpsOut" class="val">2.0 words a second</span>
+    </div>
+
+    <h2 class="ph">What it listens for</h2>
+    <details class="dd" id="phrasesDoor"><summary><svg class="chev" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 6l5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>The six things you can say<span class="cnt">edit</span></summary><div class="dd-body">
+      <p class="hint" style="margin:8px 0 10px">Each command has two ways to say it. Change either. A phrase that is already in your script is refused, because saying it while reading would set it off.</p>
+      <div id="phrases"></div>
+    </div></details>
+    <div class="row stack"><span class="lbl">Say “prompter” first mid-cut</span><button id="gate-name" aria-pressed="true">On</button></div>
+    <div class="row stack"><span class="lbl">Only when off the script</span><button id="gate-offscript" aria-pressed="true">On</button></div>
+    <div class="row stack"><span class="lbl">Not when about to be read</span><button id="gate-ahead" aria-pressed="true">On</button></div>
+    <details class="dd why"><summary><svg class="chev" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 6l5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>What this does</summary><div class="dd-body"><p class="hint">These three switches stop your own words from being taken as commands. Say “prompter” first mid-cut: inside a cut a command needs “prompter” in front; at the end of a cut plain words work. Only when off the script: a command counts only if the words around it were not in your script. Not when about to be read: a command that appears in the next few lines of your script is ignored.</p></div></details>
+
+    <h2 class="ph">What it listens with</h2>
+    <div class="row stack"><span class="lbl">Microphone</span><span class="val" style="text-align:left">this phone or laptop</span></div>
+    <details class="dd why"><summary><svg class="chev" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 6l5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>What this does</summary><div class="dd-body"><p class="hint">The microphone it listens through — the one in this phone or laptop, for now. A paired Mac, for when the phone is too far from your mouth, comes later.</p></div></details>
+
+    <details class="dd maker"><summary><svg class="chev" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 6l5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>For the maker<span class="cnt">the readouts</span></summary><div class="dd-body">
+      <p id="deviceLine" style="margin:10px 0 8px;font-family:var(--mono);font-size:.78rem;color:var(--t3)">checking…</p>
+      <div class="verdict" id="pre"></div>
+      <p class="controls" style="margin:10px 0"><button id="check">Check this browser</button><button id="reset">Reset the position</button></p>
+      <h2 class="ph">The readout</h2>
+      <dl class="grid" id="readout"></dl>
+      <div class="verdict" id="verdict" style="margin-top:10px"><div class="v"><i>waiting</i><span>Nothing measured yet.</span></div></div>
+      <h2 class="ph">The phrases, as they stand</h2>
+      <table class="log" id="cmdtable" style="max-height:none;width:100%;border-collapse:collapse;font-size:.78rem"></table>
+      <h2 class="ph">Raw events</h2>
+      <div class="log" id="log">nothing yet</div>
+    </div></details>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  // ---- the published constants, unchanged, so this test measures them too --
+  var NEAR_JUMP = 3, LOOKAHEAD = 18, REANCHOR_MISS = 4, REANCHOR_WINDOW = 6, REANCHOR_MIN = 3;
+
+  var DEFAULT = [
+    "So here's what actually happened. I spent four months building the wrong thing, and the receipt is public.",
+    "Everybody told me to validate first. I thought I had. What I had actually done was ask people whether they liked the idea.",
+    "Liking an idea costs nothing. That's the whole lesson, and it took me a quarter to learn it.",
+    "So here is the question I ask now, before I write a single line of anything."
+  ].join("\n");
+
+  var $ = function(id){ return document.getElementById(id); };
+  function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+  var scriptEl = $("script"), logEl = $("log"), readoutEl = $("readout"), verdictEl = $("verdict");
+
+  // ------------------------------------------------------------------ state
+  var cuts = [];        // [{words:[{raw,norm,el}], el}]
+  var sents = [];       // [{el, cut}] — what the sweep moves by
+  var flat = [];        // flat word list across cuts
+  var pos = 0, misses = 0, tail = [];
+  var m = null, running = false, wantRunning = false, rec = null, wake = null, speaking = false;
+
+  // Each recogniser error translated into the thing to actually go and change.
+  var REMEDY = {
+    "not-allowed": "<b>The microphone was refused to the recogniser.</b> In Safari: the <b>aA</b> button in the "
+      + "address bar → Website Settings → Microphone → Allow. Then reload.",
+    "service-not-allowed": "<b>iOS refused the speech service itself</b>, which is different from refusing the "
+      + "microphone. The usual cause is <b>Settings → General → Keyboard → Enable Dictation</b> being off — the "
+      + "web's recognition on iOS leans on the same subsystem.",
+    "language-not-supported": "<b>This device has no speech model for the page's language.</b>",
+    "audio-capture": "<b>No audio reached the recogniser.</b> Something else may be holding the microphone — "
+      + "close any other app that is recording.",
+    "network": "<b>The recogniser tried to reach a server and could not.</b> Worth knowing on its own: it means "
+      + "this browser is not recognising on the device.",
+    "no-speech": "It heard nothing for a while. Harmless once; repeated, it means your voice is not reaching it "
+      + "from where you are standing — which is exactly the case for a Mac doing the listening instead."
+  };
+
+  function blankMetrics(){
+    return { interim:0, final:0, restarts:0, errors:{}, toldAbout:{}, gaps:[], pauses:0, longestGap:0, lastResultAt:0,
+             reanchorBack:0, reanchorFwd:0, matched:0, started:0, stopped:0, firstResultLag:null };
+  }
+  m = blankMetrics();
+
+  function log(s){
+    var t = new Date().toISOString().slice(11,23);
+    logEl.textContent = t + "  " + s + "\n" + logEl.textContent;
+    if (logEl.textContent.length > 24000) logEl.textContent = logEl.textContent.slice(0,24000);
+  }
+
+  // ------------------------------------------------------------- tokenising
+  function norm(s){
+    return s.toLowerCase()
+      .replace(/[‘’]/g,"'")
+      .replace(/\b(i'm)\b/g,"i am").replace(/\b(it's)\b/g,"it is")
+      .replace(/\b(that's)\b/g,"that is").replace(/\b(here's)\b/g,"here is")
+      .replace(/\b(don't)\b/g,"do not").replace(/\b(can't)\b/g,"cannot")
+      .replace(/[^\p{L}\p{N}\s]/gu," ")
+      .split(/\s+/).filter(Boolean);
+  }
+
+  function build(text){
+    scriptEl.textContent = "";
+    cuts = []; flat = []; sents = []; pos = 0; misses = 0; tail = []; lastSent = -1;
+    takes.length = 0; openTake = null; unheardTail.length = 0; pendingCross = -1; gapArmed = -1; releasedBoundary = -1;
+    document.documentElement.style.setProperty("--band", textScale + "rem");
+    text.split(/\n/).map(function(s){ return s.trim(); }).filter(Boolean).forEach(function(line, i){
+      var p = document.createElement("p");
+      p.className = "cut";
+      var mark = document.createElement("span");
+      mark.className = "cutmark";
+      mark.textContent = "cut " + (i+1);
+      p.appendChild(mark);
+      var cut = { el:p, words:[] };
+      // Sentences are the unit the screen MOVES by (founder, 2026-09-16): at a
+      // size readable from his mark the text wraps, and a page that holds still
+      // makes his eyes travel down it — visibly, on camera.
+      var pieces = line.match(/[^.!?]+[.!?]*(?:\s+|$)/g) || [line];
+      var wordInCut = 0;   // the space belongs to the CUT's flow, not the sentence's
+      pieces.forEach(function(piece){
+        piece = piece.trim();
+        if (!piece) return;
+        var sEl = document.createElement("span");
+        sEl.className = "sent";
+        var sIdx = sents.length;
+        sents.push({ el:sEl, cut:i });
+        piece.split(/\s+/).forEach(function(rawTok){
+          var normed = norm(rawTok);
+          // The space lives OUTSIDE the word's element. Inside it, a word
+          // that wraps to a new line carries a space that hangs on the line
+          // above, and Safari then reports the element's box as spanning
+          // both lines — the founder's run of 2026-09-17 measured "nothing."
+          // on line 13 at 88px tall, and that sweep moved three lines.
+          if (wordInCut++) sEl.appendChild(document.createTextNode(" "));
+          var w = document.createElement("w");
+          w.textContent = rawTok;
+          sEl.appendChild(w);
+          // A contraction is one word on screen and TWO in the voice: the
+          // recogniser returns "here's" and "here is" alike, and norm() opens
+          // both to [here, is]. Until 2026-09-17 only the first token was
+          // kept, so every contraction cost the forward match a miss and put
+          // the backward search one position off — six re-read words of the
+          // cut's own opening caught nothing. One slot per spoken word, all
+          // sharing the element they light.
+          normed.forEach(function(nw){
+            var entry = { raw:rawTok, norm:nw, el:w, cut:i, sent:sIdx };
+            cut.words.push(entry); flat.push(entry);
+          });
+        });
+        p.appendChild(sEl);
+      });
+      cuts.push(cut);
+      scriptEl.appendChild(p);
+    });
+    measureLines();
+    drawRails();
+    paint();
+    log("script loaded: " + cuts.length + " cuts, " + flat.length + " words, " + lineTops.length + " lines");
+  }
+
+  // ------------------------------------------------------------------ paint
+  var lastCut = -1, lastSent = -1, textScale = 2.0, sweep = true;
+  // The sweep moves by RENDERED LINES, not by sentences (founder, 2026-09-16):
+  // at a size readable from his mark a single sentence can wrap to four lines,
+  // and his eyes travel all four. Two lines is the window he asked for.
+  var LINES_PER_BLOCK = 2;
+  // How far ahead of the last confirmed word the display is allowed to run.
+  // A recogniser reports a word after it was said, so by the time the fill
+  // arrives the reader is already past it. Never so far that the fill leads
+  // the mouth — over-running reads as broken where lagging only reads as slow.
+  var LEAD = 2;   // his own measurement, 2026-09-16 — and the width of the green band
+  // What a re-anchor prefers when two places in the script match equally well.
+  var BACKWARD_BIAS = 1.0;    // a restart is far commoner than a deliberate skip
+  var CUT_START_BONUS = 0.6;  // a restart begins at the top of a thought
+  var DISTANCE_COST = 0.02;   // fifty words away costs a whole point of evidence
+  var lineTops = [], lineOfWord = [], lastBlock = -1, blockFits = true;
+  var sweeps = [], corrections = [], commands = [], lastY = 0, t0 = performance.now();
+
+  function setY(y, snap){
+    if (snap) scriptEl.classList.add("snap");
+    scriptEl.style.transform = "translateY(" + y + "px)";
+    if (snap) requestAnimationFrame(function(){
+      requestAnimationFrame(function(){ scriptEl.classList.remove("snap"); });
+    });
+  }
+
+  function unmirrored(fn){
+    var st = $("stage"); if (!st) return fn();
+    st.dataset.measuring = "1";
+    try { return fn(); } finally { st.dataset.measuring = ""; }
+  }
+  function measureLines(){ return unmirrored(measureLinesRaw); }
+  function measureLinesRaw(){
+    lineTops = []; lineOfWord = []; blockFits = true;
+    if (!flat.length) return;
+    // Measure against the script's own box with the sweep transform removed,
+    // so a position is never read through the offset it is about to set.
+    var stEl = $("stage");
+    var stageTop = stEl.getBoundingClientRect().top;
+    var applied = lastY;          // the offset this code last set, in px
+    var prev = null, idx = -1;
+    for (var i = 0; i < flat.length; i++){
+      // Where this word would sit with no offset applied, measured from the
+      // top of the stage — the same space the reading line is expressed in.
+      var top = flat[i].el.getBoundingClientRect().top - stageTop - applied;
+      var key = Math.round(top / 2) * 2;   // one line = one shared top
+      if (prev === null || key > prev){ idx++; lineTops.push(top); prev = key; }
+      lineOfWord.push(idx);
+      flat[i].el.dataset.ln = idx;
+    }
+    // The last line has no line after it to measure against, so it takes the
+    // spacing of the one before. Subtracting the container's height gave -9px.
+    var end = endOf();
+
+    // Does a pair of lines actually FIT below the reading line, at this size
+    // and this column width? The founder: "we have to be mindful that it fits
+    // in the space regardless of the text size and the column size."
+    var st = $("stage");
+    if (st){
+      var tallest = 0;
+      for (var b = 0; b < lineTops.length; b += LINES_PER_BLOCK){
+        var bottom = (b + LINES_PER_BLOCK < lineTops.length) ? lineTops[b + LINES_PER_BLOCK] : end;
+        tallest = Math.max(tallest, bottom - lineTops[b]);
+      }
+      // Only judge the fit once there IS a layout. Before fonts settle every
+      // height reads zero, and a warning that fires on an unmeasured page is a
+      // detector that cannot be believed.
+      var measurable = st.clientHeight > 0 && tallest > 0;
+      blockFits = !measurable || (readingLine(st) + tallest) <= (st.clientHeight - 8);
+      var warn = $("fit");
+      if (warn){
+        warn.textContent = blockFits ? ""
+          : "Two lines do not fit on screen at this size and width — make the text smaller or the column wider, "
+            + "or the second line will sweep past before you reach it.";
+        warn.style.display = blockFits ? "none" : "block";
+      }
+    }
+    lastBlock = -1;
+  }
+
+  function lineHeightPx(){
+    return lineTops.length > 1 ? (lineTops[1] - lineTops[0]) : 44;
+  }
+
+  // Put the two rules where the live pair's lines are MEANT to start, and the
+  // third where the pair ends. Everything the eye should need is between 1 and 3.
+  // One rail per cut, drawn from its first line to its last, living inside the
+  // script so it travels with the text and needs no separate bookkeeping.
+  function drawRails(){
+    scriptEl.querySelectorAll(".rail").forEach(function(r){ r.remove(); });
+    if (!lineTops.length) return;
+    var lh = lineHeightPx();
+    cuts.forEach(function(c, i){
+      if (!c.words.length) return;
+      var firstIx = flat.indexOf(c.words[0]), lastIx = flat.indexOf(c.words[c.words.length-1]);
+      var a = lineOfWord[firstIx], b = lineOfWord[lastIx];
+      if (a == null || b == null) return;
+      var r = document.createElement("div");
+      r.className = "rail"; r.dataset.i = i;
+      r.style.top = lineTops[a] + "px";
+      r.style.height = Math.max(6, (lineTops[b] - lineTops[a]) + lh - 6) + "px";
+      var cap = document.createElement("span"); cap.className = "cap";
+      r.appendChild(cap);
+      r.dataset.lastLine = b;
+      scriptEl.appendChild(r);
+    });
+  }
+
+  var RAIL_IDLE = "#3a3732", RAIL_HERE = "#a89557", RAIL_END = "#9085e9", RAIL_LOST = "#e0a86b";
+  function markRails(curCut, onLastLineOfCut){
+    scriptEl.querySelectorAll(".rail").forEach(function(r){
+      var mine = +r.dataset.i === curCut;
+      var ending = mine && onLastLineOfCut;
+      // Orange on the cut being read while it has lost him or stopped hearing
+      // (F-7/F-8): the one colour the face uses for nothing else.
+      r.style.background = (mine && (lost || fallback)) ? RAIL_LOST : ending ? RAIL_END : (mine ? RAIL_HERE : RAIL_IDLE);
+      r.style.width = ending ? "9px" : "5px";
+      r.style.right = ending ? "-15px" : "-13px";
+      r.style.boxShadow = ending ? "0 0 18px rgba(144,133,233,.55)" : "none";
+      var cap = r.querySelector(".cap");
+      if (cap) cap.style.opacity = mine ? "1" : ".5";
+      r.dataset.state = ending ? "ending" : (mine ? "here" : "idle");
+    });
+    var cc = $("cutchip");
+    if (cc) cc.dataset.end = onLastLineOfCut ? "near" : "";
+  }
+
+  function placeGuides(){
+    var st = $("stage"); if (!st) return;
+    var rl = readingLine(st), lh = lineHeightPx();
+    var g1 = $("g1"), g2 = $("g2"), g3 = $("g3"), v = $("vision");
+    if (g1) g1.style.top = rl + "px";
+    if (g2) g2.style.top = (rl + lh) + "px";
+    if (g3) g3.style.top = (rl + lh * LINES_PER_BLOCK) + "px";
+    if (v){ v.style.top = rl + "px"; v.style.height = (lh * LINES_PER_BLOCK) + "px"; }
+    // The last line and a half he said stays legible above the reading line
+    // (founder, 2026-09-17: "room for the text that's leaving the eye view in
+    // case I need to recall and repeat what I said"); only what is above THAT
+    // fades to black.
+    var tf = $("topfade"); if (tf) tf.style.height = Math.max(0, rl - lh * RECALL_LINES) + "px";
+    var pb = $("pause"); if (pb) pb.style.top = (rl + lh * LINES_PER_BLOCK + 2) + "px";
+  }
+  var RECALL_LINES = 1.5;
+
+  // After a sweep settles, where did the pair's two lines ACTUALLY land against
+  // those rules? The founder asked for exactly this: "we measure those lines and
+  // the line items moving in to see if they're properly within that area."
+  function checkAdherence(entry, firstLine){ return unmirrored(function(){ checkAdherenceRaw(entry, firstLine); }); }
+  function checkAdherenceRaw(entry, firstLine){
+    var st = $("stage"); if (!st || !entry) return;
+    var rl = readingLine(st), lh = lineHeightPx();
+    var stageTop = st.getBoundingClientRect().top;
+    function topOfLine(ln){
+      for (var i = 0; i < flat.length; i++) if (lineOfWord[i] === ln)
+        return flat[i].el.getBoundingClientRect().top - stageTop;
+      return null;
+    }
+    var a = topOfLine(firstLine), b = topOfLine(firstLine + 1);
+    entry.errA = a == null ? null : Math.round(a - rl);
+    entry.errB = b == null ? null : Math.round(b - (rl + lh));
+  }
+
+  // ONE place, always the same fraction down the stage: the founder asked for
+  // the top line to land in the same spot every time, and a reading line that
+  // moves is the bug he reported.
+  // A control, like text size and column width, because it is the same kind of
+  // setting — his eyes at his distance. 30% down by default (was 18%): ruled
+  // 2026-09-17 so the strip between takes leaves the departing lines visible.
+  var READ_FRAC = 0.30;
+  function readingLine(st){ return Math.round((st || $("stage")).clientHeight * READ_FRAC); }
+
+  // Where the last line ends. Asked in three places; answered here only.
+  function endOf(){
+    var n = lineTops.length;
+    if (!n) return 0;
+    return n > 1 ? lineTops[n-1] + (lineTops[n-1] - lineTops[n-2]) : lineTops[0] + scriptEl.offsetHeight;
+  }
+  function relayout(){ measureLines(); drawRails(); lastBlock = -1; paint(); placeGuides(); }
+  function sizeCuts(){
+    cuts.forEach(function(c){
+      // In sweep mode every cut is the SAME size. Anything else reflows the
+      // page while he reads and makes the measured line positions a lie.
+      var f = 1;
+      if (!sweep){
+        var rel = c.el.dataset.rel;
+        f = rel === "now" ? 1 : (rel === "past" ? 0.68 : 0.76);
+      }
+      c.el.style.fontSize = (textScale * f).toFixed(3) + "rem";
+    });
+  }
+  function paint(){
+    // ONE cursor: the word the display believes he is on. It leads the last
+    // confirmed word by LEAD, and it drives the fill AND the sweep, so the
+    // green word and the moment the page moves can never disagree.
+    var held = isHeld();
+    var cur = pos >= flat.length ? cuts.length - 1 : activeCut();
+    var cutWords = cuts[cur] && cuts[cur].words.length ? cuts[cur].words : null;
+    var cutLastWord = cutWords ? flat.indexOf(cutWords[cutWords.length - 1]) : flat.length - 1;
+    // The lead may run ahead inside a cut; it may not run into the next one.
+    var cursor = Math.max(0, Math.min(pos - 1 + LEAD, flat.length - 1, cutLastWord));
+    var chip = $("cutchip");
+    if (chip) chip.textContent = held
+      ? "end of cut " + (cur + 1) + " · say “move on”"
+      : "cut " + (cur + 1) + " of " + cuts.length;
+    // Is he on the last line of this cut? That is when a bare command is safe
+    // and when he is about to stop the camera — both worth showing.
+    var lastWordOfCut = cutLastWord;
+    // One pair of warning, not none: on the last line he has already arrived.
+    var onLast = false;
+    if (lastWordOfCut >= 0 && lineOfWord.length){
+      var endLine = lineOfWord[lastWordOfCut], hereLine = lineOfWord[Math.min(cursor, flat.length-1)];
+      onLast = (endLine - hereLine) < LINES_PER_BLOCK;
+    }
+    if (held) onLast = true;   // held reads as "ending" on the rail, and stays
+    var st0 = $("stage"); if (st0) st0.dataset.held = held ? "1" : "";
+    markRails(cur, !!onLast);
+    cuts.forEach(function(c, i){
+      c.el.dataset.rel = i === cur ? "now" : (i < cur ? "past" : (i === cur + 1 ? "next" : "far"));
+    });
+    sizeCuts();
+    flat.forEach(function(w, i){
+      w.el.className = i < pos ? "said"              // heard: the recogniser reported it
+                     : (i <= cursor ? "now" : "");   // believed: the lead's width
+    });
+    // Where the eye should be. In sweep mode the reading line never moves and
+    // the text is swept under it, one finished sentence at a time.
+    if (sweep && lineTops.length){
+      // Fire on the LAST WORD OF THE PAIR, not on the first word of the next
+      // pair. Founder, 2026-09-16: "it needs to listen to the last word of the
+      // second line and then shift up." Waiting for the next line's first word
+      // costs a whole recognition delay AND makes him look three lines down.
+      var curLine = lineOfWord[cursor] || 0;
+      var block = Math.floor(curLine / LINES_PER_BLOCK);
+      var lastLineOfBlock = block * LINES_PER_BLOCK + (LINES_PER_BLOCK - 1);
+      var endsTheLine = cursor >= flat.length - 1 || lineOfWord[cursor + 1] !== curLine;
+      if (pos > 0 && curLine === lastLineOfBlock && endsTheLine) block += 1;
+      var lastBlockIdx = Math.floor(Math.max(0, lineTops.length - 1) / LINES_PER_BLOCK);
+      block = Math.min(block, lastBlockIdx);
+      // Hold at the pair carrying this cut's last line until his words actually
+      // enter the next cut. The purple stays on a line he can still see.
+      if (lineOfWord.length && cutLastWord >= 0 && cutLastWord < lineOfWord.length){
+        block = Math.min(block, Math.floor(lineOfWord[cutLastWord] / LINES_PER_BLOCK));
+      }
+      var firstOfBlock = block * LINES_PER_BLOCK;
+      // Everything above the live pair recedes; the pair itself and what is
+      // coming stay readable, which is the founder's karaoke brief.
+      for (var q = 0; q < flat.length; q++){
+        var ln = lineOfWord[q];
+        flat[q].el.classList.toggle("above", ln < firstOfBlock);
+      }
+      var st = $("stage");
+      if (st){
+        var toY = readingLine(st) - lineTops[firstOfBlock];
+        var first = lastBlock === -1;
+        var movedPair = !first && block !== lastBlock;
+        if (Math.round(toY) !== Math.round(lastY)){
+          if (movedPair){
+            sweeps.push({ block: block, toY: Math.round(toY), from: Math.round(lastY),
+                          d: Math.round(toY - lastY), line: firstOfBlock,
+                          word: flat[cursor] ? flat[cursor].raw : "",
+                          t: Math.round(performance.now() - t0) });
+          } else {
+            // Same pair, new measurement: put it right without animating, so a
+            // re-measure never reads as the page moving on its own.
+            corrections.push({ line: firstOfBlock, d: Math.round(toY - lastY),
+                               t: Math.round(performance.now() - t0) });
+          }
+          lastY = toY;
+          setY(toY, !movedPair);   // only a change of pair animates
+          placeGuides();
+          (function(e, fl, n){
+            // Measure once the slide has finished — and only if nothing has
+            // moved since, or the reading would describe a different pair.
+            setTimeout(function(){
+              if (sweeps.length !== n){ if (e) e.skipped = true; return; }
+              checkAdherence(e, fl);
+            }, movedPair ? 520 : 30);
+          })(sweeps.length ? sweeps[sweeps.length-1] : null, firstOfBlock, sweeps.length);
+        }
+        lastBlock = block;
+      }
+    } else if (!sweep && cur !== lastCut){
+      lastCut = cur;
+      // Never let moving the view take the repaint down with it: the fill is
+      // the product, the scroll is a convenience.
+      var el = cuts[cur] && cuts[cur].el;
+      if (el && typeof el.scrollIntoView === "function"){
+        try { el.scrollIntoView({ block:"start", behavior:"smooth" }); }
+        catch(e){ try { el.scrollIntoView(true); } catch(e2){} }
+      }
+    }
+    m.matched = pos;
+    var kept = {};
+    takes.forEach(function(t){ if (t.kept) kept[t.cut] = 1; });
+    scriptEl.querySelectorAll(".rail").forEach(function(r){ r.dataset.kept = kept[+r.dataset.i] ? "1" : ""; });
+    paintGap();
+    render();
+  }
+
+  // --------------------------------------------------------------- matching
+  function ed1(a,b){ // edit distance <= 1, cheap
+    if (a === b) return true;
+    var la=a.length, lb=b.length;
+    if (Math.abs(la-lb) > 1) return false;
+    var i=0,j=0,diff=0;
+    while (i<la && j<lb){
+      if (a[i]===b[j]){ i++; j++; continue; }
+      if (++diff > 1) return false;
+      if (la > lb) i++; else if (lb > la) j++; else { i++; j++; }
+    }
+    return true;
+  }
+  function same(a,b){
+    if (a === b) return true;
+    if (a.length >= 5 && b.length >= 5 && Math.abs(a.length-b.length) <= 2) return ed1(a,b);
+    return false;
+  }
+
+  function reanchor(){
+    var win = tail.slice(-REANCHOR_WINDOW);
+    if (win.length < REANCHOR_MIN) { misses = 0; return; }
+    var best = -1, bestEff = -1e9, bestRaw = 0;
+    // Bias the search to CUT STARTS — a restart begins at the top of a thought.
+    var anchors = [], isStart = {};
+    cuts.forEach(function(c){ if (c.words.length){ var ix = flat.indexOf(c.words[0]); anchors.push(ix); isStart[ix] = 1; } });
+    for (var i=0;i<flat.length;i++) anchors.push(i);
+    var bestLen = win.length;
+    for (var a=0;a<anchors.length;a++){
+      var s = anchors[a];
+      // The window may still hold the last words of the line he ABANDONED in
+      // front of the words he is re-reading, so it is also tried with its
+      // stale front dropped. Positional alignment is kept (the overlap
+      // scoring tried on 2026-09-16 broke the verbatim restart); only where
+      // the window starts moves. Found 2026-09-17: six re-read words of the
+      // cut's own opening caught nothing, because four of the six sat behind
+      // two abandoned ones.
+      for (var d = 0; d <= win.length - REANCHOR_MIN; d++){
+        var score = 0, sub = win.length - d;
+        for (var k=0;k<sub && s+k < flat.length;k++) if (same(flat[s+k].norm, win[d+k])) score++;
+        if (!score) continue;
+        var eff = score
+                + (isStart[s] ? CUT_START_BONUS : 0)
+                + (s < pos ? BACKWARD_BIAS : 0)        // going back beats going on
+                - Math.abs(s - pos) * DISTANCE_COST;   // near beats far on equal evidence
+        if (eff > bestEff){ bestEff = eff; best = s; bestRaw = score; bestLen = sub; }
+      }
+    }
+    var bestScore = bestRaw;
+    if (best >= 0 && bestRaw >= REANCHOR_MIN){
+      var to = Math.min(best + bestLen, flat.length);
+      if (to < pos) m.reanchorBack++; else m.reanchorFwd++;
+      log((to < pos ? "RE-ANCHOR BACK " : "re-anchor FORWARD ") + pos + " → " + to +
+          " (matched " + bestRaw + " of " + win.length + " · line " +
+          (lineOfWord[Math.min(to, flat.length-1)]) + " from line " + (lineOfWord[Math.min(pos, flat.length-1)]) + ")");
+      if (to < pos){ showRewind(to, pos); flash("↺ back"); }
+      // The log's view of a re-read: back to the top of the cut is a new take;
+      // back to the middle of it is a stumble inside the same take.
+      if (openTake && to < pos){
+        var before = flat[pos] ? flat[pos].raw : null;
+        if (cutOf(best) !== openTake.cut) closeTake("went back to cut " + (cutOf(best) + 1) + " by re-reading", before);
+        else if (best === flat.indexOf(cuts[openTake.cut].words[0])) closeTake("started over by re-reading", before);
+        else openTake.rewinds++;
+      }
+      pos = to; misses = 0; paint();
+    } else { misses = 0; }
+    // Tried and reverted the same day (2026-09-17): retrying on every miss
+    // after a failed re-anchor. It caught a re-read sooner and, on the same
+    // staged case, jumped FORWARD a whole script on three common words — a
+    // false skip, the expensive failure. Dropping the window's stale front
+    // (above) gets the earlier catch without the extra evaluations.
+  }
+
+  // ------------------------------------------------------------- commands
+  // Ruled 2026-09-16. The three gates, as switches: the phrase must arrive
+  // while OFF the script, must not be in the words just ahead, and must be
+  // said on its own — modelled as a run of words that matched nothing.
+  var GATE_OFFSCRIPT = true, GATE_NOT_AHEAD = true, GATE_ALONE = true;
+  var NAME = "prompter";
+  // ONE owner for the vocabulary: the table on the page and the strip's hint
+  // are both rendered from this list (a second, typed copy of the phrases is
+  // Recurring Bug Class #1, and it was here until 2026-09-17).
+  var COMMANDS = [
+    { id:"restart", say:["take that again", "take it again"], does:"Back to the top of the cut you just said." },
+    { id:"keep",    say:["that's the one", "keep that"],       does:"Mark the take you just finished as the keeper." },
+    { id:"next",    say:["move on", "next cut"],               does:"Go on to the next cut." },
+    { id:"back",    say:["back up", "previous cut"],           does:"Go back a whole cut." },
+    // Ruled 2026-09-17 (his note on G-8): "from the top" resets the whole
+    // script. It had been the second phrasing of the cut restart; "take it
+    // again" — the phrase he actually said on 2026-09-16 — takes that place.
+    { id:"top",     say:["from the top", "start over"],        does:"Back to the start of the script. Your takes are kept." },
+    // Founder, 2026-09-17, after his first real run: end the session by voice
+    // at the end of the script. "That's the one" said after the last cut
+    // keeps the take AND ends the session; this is the explicit way out from
+    // any gap, without keeping anything.
+    { id:"wrap",    say:["that's a wrap", "we're done"],       does:"End the session. After the last cut, “that’s the one” ends it too." }
+  ];
+  // Ruled 2026-09-16 (V-2/V-3): plain words at the end of a cut; the name in
+  // the middle of one. Built as ruled on 2026-09-17 — before that a bare
+  // phrase fired anywhere off-script, which the founder had not asked for.
+  var GATE_NAME_MIDTAKE = true;
+  var offTail = [];                 // words that have matched nothing
+  var undoPos = -1, undoUntil = 0;  // "act at once, and hold an undo"
+  var UNDO_MS = 4000;
+  var pendingCross = -1, pendingCrossAt = 0;   // a next-cut first word heard while held, awaiting its second
+  var lastCommandAt = -1e9;
+  // The listener's FINAL result often corrects its earlier guess — "that a a
+  // wrap" became "that's a wrap" on his run of 2026-09-17 — but the guess had
+  // already consumed the words, so the correction never reached the command
+  // check. A final is re-read for a phrase at its end; a command that already
+  // fired from the guess is not fired twice.
+  function commandFromFinal(words){
+    if (!words.length || performance.now() - lastCommandAt < 2500) return false;
+    return commandHeard(words.slice(-6), true);
+  }
+  var gapArmed = -1, gapArmedHow = "";   // a cut he was sent to by command, until his first word — and how
+  var noticeText = "", noticeKind = "", noticeUntil = 0;
+
+  // ------------------------------------------------------------ the take log
+  // A row per attempt, written at the cut boundary. Measured facts only, and
+  // no score, ever (PRD §7): the log records, it never ranks. A take exists
+  // from its first HEARD word — a command that sends him somewhere he never
+  // reads from writes nothing.
+  var takes = [], openTake = null;
+  function takeCountFor(cut){ var n = 0; for (var i = 0; i < takes.length; i++) if (takes[i].cut === cut) n++; return n; }
+  function openTakeFor(cut, startedAt){
+    if (openTake && openTake.cut === cut) return openTake;
+    if (openTake) closeTake("ran on into cut " + (cut + 1), flat[pos] ? flat[pos].raw : null);
+    openTake = { cut: cut, n: takeCountFor(cut) + 1, startedAt: startedAt != null ? startedAt : Math.round(performance.now() - t0), seen: {},
+                 heard: 0, of: cuts[cut].words.length, rewinds: 0, dropped: false, kept: false,
+                 endedAt: null, how: null, stoppedBefore: null, unheard: null };
+    gapArmed = -1;
+    log("TAKE cut " + (cut+1) + " take " + openTake.n + " begins");
+    return openTake;
+  }
+  function heardWord(j){
+    var tk = openTakeFor(flat[j].cut);
+    if (!tk.seen[j]){ tk.seen[j] = 1; tk.heard = Object.keys(tk.seen).length; }
+  }
+  function closeTake(how, stoppedBefore){
+    if (!openTake) return null;
+    openTake.endedAt = Math.round(performance.now() - t0);
+    openTake.how = how; openTake.stoppedBefore = stoppedBefore || null;
+    takes.push(openTake);
+    var t = openTake; openTake = null;
+    log("TAKE cut " + (t.cut+1) + " take " + t.n + " · " + how + (t.stoppedBefore ? " before “" + t.stoppedBefore + "”" : "") +
+        " · heard " + t.heard + " of " + t.of + (t.unheard ? " · not heard: " + t.unheard.join(" ") : ""));
+    return t;
+  }
+  function lastClosedTake(){ return takes.length ? takes[takes.length-1] : null; }
+  function lastWordOf(cut){ var c = cuts[cut]; return c && c.words.length ? flat.indexOf(c.words[c.words.length-1]) : -1; }
+
+  // He is within the lead of a cut's end: the words left unheard, or null.
+  // A recogniser drops a final word often enough that "the last word was
+  // heard" cannot be the only way a cut ends (found 2026-09-17: a dropped
+  // last word left him un-held, and his "move on" then HELD him).
+  function unheardTailOf(cut){
+    var c = cuts[cut]; if (!c || !c.words.length) return null;
+    var last = lastWordOf(cut), first = flat.indexOf(c.words[0]);
+    var left = last + 1 - pos;
+    return (left > 0 && left <= LEAD && pos > first) ? flat.slice(pos, last + 1) : null;
+  }
+  var unheardTail = [];   // word indices finished past, still listened for
+  function finishCutEarly(why){
+    var cut = cutOf(pos), tail = unheardTailOf(cut);
+    if (!tail) return false;
+    var tk = openTake && openTake.cut === cut ? openTake : null;
+    if (tk) tk.unheard = tail.map(function(w){ return w.raw; });
+    unheardTail = tail.map(function(w){ return flat.indexOf(w); });
+    pos = unheardTail[unheardTail.length-1] + 1;
+    closeTake("to the end");
+    log("FINISHED EARLY (" + why + ") — not heard: " + tail.map(function(w){ return w.raw; }).join(" "));
+    return true;
+  }
+  var END_SLACK_MS = 2500;   // silence inside the last words means he has finished
+  function pauseBar(frac){
+    var pb = $("pause"); if (!pb) return;
+    pb.dataset.on = frac > 0 ? "1" : "";
+    pb.style.transform = "scaleX(" + (frac > 0 ? Math.min(1, frac).toFixed(3) : "0") + ")";
+  }
+  setInterval(function(){
+    if (!running || !m.lastResultAt || isHeld() || pos >= flat.length || !unheardTailOf(cutOf(pos))){ pauseBar(0); return; }
+    var waited = performance.now() - m.lastResultAt;
+    pauseBar(waited / END_SLACK_MS);   // the pause, running down, in purple under the pair
+    if (waited > END_SLACK_MS){
+      pauseBar(0);
+      finishCutEarly("silence"); lastBlock = -1; paint();
+    }
+  }, 400);
+
+  function notice(msg, kind){
+    noticeText = msg; noticeKind = kind || ""; noticeUntil = performance.now() + 3000;
+    flash(msg); paintGap();
+    setTimeout(function(){ if (performance.now() >= noticeUntil) paintGap(); }, 3050);
+  }
+  // Are the words that matched nothing the START of a phrase it knows? Then
+  // the command may still be coming, and echoing "heard 'take that'" at him
+  // would be noise in the one place feedback has to be exact.
+  function startsACommand(){
+    for (var i = 0; i < COMMANDS.length; i++) for (var j = 0; j < COMMANDS[i].say.length; j++){
+      var w = phraseWords(COMMANDS[i].say[j]), forms = [w, [NAME].concat(w)];
+      for (var f = 0; f < forms.length; f++){
+        var ph = forms[f];
+        for (var k = 1; k <= Math.min(ph.length, offTail.length); k++){
+          var ok = true;
+          for (var q = 0; q < k; q++) if (offTail[offTail.length - k + q] !== ph[q]){ ok = false; break; }
+          if (ok) return true;
+        }
+      }
+    }
+    return false;
+  }
+  function hint(ids){
+    return ids.map(function(id){
+      for (var i = 0; i < COMMANDS.length; i++) if (COMMANDS[i].id === id) return "<q>" + esc(COMMANDS[i].say[0]) + "</q>";
+      return "";
+    }).join(" · ");
+  }
+  // What the strip says while his eyes are free — derived from state, never
+  // typed into a template, so it cannot disagree with the log it describes.
+  function gapState(){
+    if (!flat.length) return null;
+    if (pos >= flat.length){
+      // "From the top" leads here (founder, 2026-09-17: "make sure the command
+      // we see is the one that says start from the top"); "that's the one"
+      // both keeps the last take and ends the session.
+      // "From the top" and "that's a wrap" lead (founder, 2026-09-17), then
+      // the whole vocabulary, as a marquee — one list, two copies for the loop.
+      var all = hint(["top", "wrap", "keep", "restart", "back", "next"]) + " · <q>that’s the one</q> also ends the session";
+      return { what: wantRunning ? "End of the script · " + takes.length + (takes.length === 1 ? " take" : " takes") : "Session ended · " + takes.length + (takes.length === 1 ? " take" : " takes"),
+               say: wantRunning ? "<span>" + all + " &nbsp;·&nbsp; " + all + " &nbsp;·&nbsp; </span>" : "the log is below",
+               marquee: !!wantRunning, kept: false, tone: "command" };
+    }
+    if (isHeld()){
+      var c = activeCut(), t = lastClosedTake(), mine = (t && t.cut === c) ? t : null;
+      var what = "Cut " + (c+1);
+      if (mine) what += " · take " + mine.n + (mine.kept ? " ★ kept" : " · to the end");
+      // The honest qualifier goes where there is room, and it clears itself the
+      // moment the word arrives late.
+      // Every hold scrolls the whole vocabulary, the relevant three first
+      // (founder, 2026-09-17: "make all the commands a marquee in the same
+      // way that we do the last cut"). A missing last word still gets its
+      // still line, because that one is an instruction, not a menu.
+      var allHold = hint(["restart", "keep", "next", "back", "top", "wrap"]);
+      var unheard = !!(mine && mine.unheard);
+      var say = unheard
+        ? "not heard: “" + esc(mine.unheard.join(" ")) + "” — say it, or go on"
+        : "<span>" + allHold + " &nbsp;·&nbsp; " + allHold + " &nbsp;·&nbsp; </span>";
+      return { what: what, say: say, kept: !!(mine && mine.kept), tone: "command", marquee: !unheard };
+    }
+    if (gapArmed >= 0){
+      return { what: "Cut " + (gapArmed+1) + " · take " + (takeCountFor(gapArmed) + 1) + " · " + (gapArmedHow || "ready"),
+               say: "read when you are ready", kept: false, tone: "command" };
+    }
+    return null;
+  }
+  function paintGap(){
+    var g = $("gap"), st = $("stage"); if (!g || !st) return;
+    var s = gapState();
+    st.dataset.gap = s ? "1" : "";
+    if (!s) return;
+    var rl = readingLine(st), w = g.querySelector(".what"), lh = lineHeightPx();
+    // A touch smaller than the words (0.8×, his ruling of 2026-09-17), and
+    // never so tall that it covers the last line and a half he said: the
+    // strip may use only what is above those lines.
+    var room = rl - lh * RECALL_LINES - 30;   // the hint line and padding take the rest
+    var px = Math.min(Math.round(textScale * 16 * 0.8), Math.max(16, Math.floor(room / 1.2)));
+    w.style.fontSize = px + "px";
+    w.textContent = s.what;
+    // Shrink until the line fits: a label that ellipsises at his size is a
+    // label he cannot read from his mark (measured 335px in a 324px strip).
+    while (px > 16 && w.scrollWidth > w.clientWidth){ px -= 1; w.style.fontSize = px + "px"; }
+    g.dataset.kept = s.kept ? "1" : "";
+    g.dataset.tone = s.tone || "";
+    var say = g.querySelector(".say");
+    if (performance.now() < noticeUntil){ say.textContent = noticeText; say.dataset.kind = noticeKind; say.classList.remove("marquee"); }
+    else if (s.marquee){
+      // Only rebuild when the text changes, or the animation restarts on
+      // every repaint and the list jumps back to its start.
+      if (say.innerHTML !== s.say){ say.innerHTML = s.say; say.style.setProperty("--marq", Math.round(say.textContent.length * 0.11) + "s"); }
+      say.dataset.kind = ""; say.classList.add("marquee");
+    }
+    else { say.innerHTML = s.say; say.dataset.kind = ""; say.classList.remove("marquee"); }
+  }
+  function renderCommandTable(){
+    var t = $("cmdtable"); if (!t) return;
+    t.innerHTML = COMMANDS.map(function(c){
+      return '<tr><td style="padding:5px 12px 5px 0;color:var(--lime);white-space:nowrap">' +
+             c.say.map(function(s){ return "“" + esc(s) + "”"; }).join("<br>") +
+             '</td><td style="padding:5px 0;color:var(--t2)">' + esc(c.does) + '</td></tr>';
+    }).join("");
+  }
+
+  function phraseWords(s){ return norm(s); }
+
+  // A command word matches loosely: the listener returned "rap" for "wrap"
+  // on his run of 2026-09-17, and a phrase is only ever a few words that
+  // must all land in order, so one letter's slack per word is safe.
+  function sameLoose(a, b){
+    if (a === b) return true;
+    return a.length >= 3 && b.length >= 3 && Math.abs(a.length - b.length) <= 1 && ed1(a, b);
+  }
+  function tailEndsWith(words, tailArr){
+    var t = tailArr || offTail;
+    if (t.length < words.length) return false;
+    var start = t.length - words.length;
+    for (var i = 0; i < words.length; i++) if (!sameLoose(t[start + i], words[i])) return false;
+    return true;
+  }
+
+  function isJustAhead(words){
+    var upto = Math.min(pos + 20, flat.length);
+    for (var s = pos; s < upto; s++){
+      var hit = 0;
+      for (var k = 0; k < words.length && s + k < flat.length; k++) if (flat[s+k].norm === words[k]) hit++;
+      if (hit === words.length) return true;
+    }
+    return false;
+  }
+
+  function flash(msg){
+    var el = $("cmdflash"); if (!el) return;
+    el.textContent = msg; el.style.opacity = "1";
+    clearTimeout(el._t); el._t = setTimeout(function(){ el.style.opacity = "0"; }, 1100);
+  }
+
+  // What came back should announce itself. A restart that only changes which
+  // word is green is a restart he has to notice; this one arrives.
+  function showRewind(fromWord, toWord){
+    var a = Math.max(0, Math.min(toWord, fromWord)), b = Math.min(flat.length, Math.max(toWord, fromWord));
+    for (var i = a; i < b && i < a + 60; i++){
+      (function(el){ el.classList.remove("rewound"); void el.offsetWidth; el.classList.add("rewound");
+        setTimeout(function(){ el.classList.remove("rewound"); }, 800); })(flat[i].el);
+    }
+  }
+
+  function runCommand(id){
+    commands.push({ id: id, t: Math.round(performance.now() - t0), from: pos });
+    lastCommandAt = performance.now();
+    noticeUntil = 0;   // whatever the strip was saying, the command supersedes it
+    // A command said inside the last words of a cut is about a cut he has
+    // plainly finished: close it first, so nothing below acts on a take that
+    // is one dropped word from done.
+    if (id !== "keep" && !isHeld()) finishCutEarly(id);
+    if (id === "restart"){
+      undoPos = pos; undoUntil = performance.now() + UNDO_MS;
+      var c = activeCut();
+      var wasAt = pos;
+      var target = flat.indexOf(cuts[c].words[0]);
+      // Already at the top of this cut? Then he cannot mean this one — he means
+      // the one he just said. "Do it again" is always about what was spoken.
+      if (target === pos && c > 0) { c = c - 1; target = flat.indexOf(cuts[c].words[0]); }
+      if (openTake) closeTake("stopped", flat[wasAt] ? flat[wasAt].raw : null);
+      pos = target;
+      releasedBoundary = cutOf(pos);   // he asked to be here; do not hold him
+      gapArmed = c; gapArmedHow = "again";
+      showRewind(pos, wasAt);
+      flash(wasAt === pos ? "↺ already at the top" : "↺ from the top of cut " + (c+1));
+      log("COMMAND take that again → cut " + (c+1) + ", word " + pos);
+    } else if (id === "next"){
+      if (isHeld()){
+        // At a boundary the words are already in place; the command releases.
+        releasedBoundary = cutOf(pos);
+        log("COMMAND move on → released the hold at cut " + (cutOf(pos) + 1));
+      } else if (pos >= flat.length){
+        notice("that was the last cut", "done");   // never nothing
+        log("COMMAND move on → nothing after the last cut");
+      } else {
+        var c2 = activeCut();
+        if (c2 + 1 < cuts.length && cuts[c2+1].words.length){ undoPos = pos; undoUntil = performance.now() + UNDO_MS;
+          if (openTake) closeTake("stopped", flat[pos] ? flat[pos].raw : null);
+          pos = flat.indexOf(cuts[c2+1].words[0]); releasedBoundary = cutOf(pos); gapArmed = c2 + 1; gapArmedHow = "ready"; }
+        else notice("that was the last cut", "done");
+        log("COMMAND move on → word " + pos);
+      }
+    } else if (id === "back"){
+      var c3 = activeCut();
+      if (c3 > 0 && cuts[c3-1].words.length){ undoPos = pos; undoUntil = performance.now() + UNDO_MS;
+        if (openTake) closeTake("stopped", flat[pos] ? flat[pos].raw : null);
+        pos = flat.indexOf(cuts[c3-1].words[0]); releasedBoundary = cutOf(pos); gapArmed = c3 - 1; gapArmedHow = "ready"; }
+      else notice("this is the first cut");      // never nothing
+      log("COMMAND back up → word " + pos);
+    } else if (id === "top"){
+      if (pos === 0 && !openTake) notice("already at the top");   // never nothing
+      else {
+        undoPos = pos; undoUntil = performance.now() + UNDO_MS;
+        if (openTake) closeTake("stopped", flat[pos] ? flat[pos].raw : null);
+        var wasTop = pos;
+        pos = 0; releasedBoundary = 0; gapArmed = 0; gapArmedHow = "from the top";
+        showRewind(0, wasTop);
+        flash("↺ from the top of the script");
+        log("COMMAND from the top → word 0");
+      }
+    } else if (id === "keep"){
+      // Marks the attempt just FINISHED (ruling V-4) — never one in progress.
+      if (openTake && unheardTailOf(openTake.cut)) finishCutEarly("keep");
+      var t = lastClosedTake();
+      if (!t) notice("nothing to keep yet — finish a cut first");
+      else if (t.kept && pos < flat.length) notice("cut " + (t.cut+1) + " take " + t.n + " is already kept");
+      else {
+        if (!t.kept){ t.kept = true; t.keptAt = Math.round(performance.now() - t0); }
+        // At the end of the script the keeper is the last word of the shoot:
+        // the session ends with it (founder, 2026-09-17).
+        if (pos >= flat.length){ notice("★ kept — and that's a wrap", "done"); stopSession("ended by voice after the last cut"); }
+        else notice("★ kept — cut " + (t.cut+1) + " take " + t.n, "done");
+      }
+      log("COMMAND that's the one" + (t ? " → cut " + (t.cut+1) + " take " + t.n + (t.kept ? " kept" : "") : " → nothing to keep"));
+    } else if (id === "wrap"){
+      notice("that's a wrap", "done");
+      stopSession("that's a wrap");
+      log("COMMAND that's a wrap → session ended");
+    }
+    offTail.length = 0; misses = 0; tail.length = 0; pendingCross = -1;
+    lastBlock = -1;                 // the pair must be re-placed, not animated from stale state
+    paint();
+  }
+
+  // Returns true when the words just heard were an instruction, not script.
+  // `tailArr` is the words to read the phrase from — the running off-script
+  // tail by default, or the corrected end of a FINAL result (`fromFinal`).
+  function commandHeard(tailArr, fromFinal){
+    var t = tailArr || offTail;
+    if (GATE_ALONE && !t.length) return false;
+    for (var i = 0; i < COMMANDS.length; i++){
+      for (var j = 0; j < COMMANDS[i].say.length; j++){
+        var w = phraseWords(COMMANDS[i].say[j]);
+        var named = [NAME].concat(w);
+        var bare = tailEndsWith(w, t), withName = tailEndsWith(named, t);
+        if (!bare && !withName) continue;
+        // The name is always accepted; bare phrases need the other gates.
+        if (!withName){
+          if (GATE_OFFSCRIPT && misses === 0 && !fromFinal) continue;
+          if (GATE_NOT_AHEAD && isJustAhead(w)) continue;
+          // Mid-cut, a bare phrase is refused — and says so, because a control
+          // that fires and does nothing is the worst thing this surface does.
+          // "The end of a cut" includes its last words when the last word never
+          // arrived — he has plainly finished, and the take says which word.
+          // Before the first word of the session is a gap too.
+          if (GATE_NAME_MIDTAKE && !(isHeld() || pos >= flat.length || gapArmed >= 0 || (pos === 0 && !openTake) || unheardTailOf(cutOf(pos)))){
+            flash("say “" + NAME + ", " + COMMANDS[i].say[j] + "”");
+            log("refused bare “" + COMMANDS[i].say[j] + "” mid-cut — the name is needed there");
+            offTail.length = 0;
+            return false;
+          }
+        }
+        runCommand(COMMANDS[i].id);
+        return true;
+      }
+    }
+    return false;
+  }
+
+  function cutOf(i){ return flat[Math.max(0, Math.min(i, flat.length - 1))].cut; }
+  // He has finished a cut and not started the next one. This is the window for
+  // a spoken command, and the prompter waits in it rather than moving on.
+  var releasedBoundary = -1;   // the cut he has consciously stepped into
+  function isHeld(){
+    return pos > 0 && pos < flat.length && cutOf(pos - 1) < cutOf(pos)
+           && cutOf(pos) !== releasedBoundary;
+  }
+  // The cut the surface is ABOUT — the one he just finished while held, the one
+  // he is reading otherwise. Everything asks this: the rail, the label, the
+  // hold clamp, and every command.
+  function activeCut(){ return isHeld() ? cutOf(pos - 1) : cutOf(Math.min(pos, flat.length - 1)); }
+
+  // ------------------------------------------------- lost · dead · counting
+  // Ruled 2026-09-17 off the face sheet. Three states the reading face can be
+  // in besides reading, each said in words at the foot, never over the words.
+  var lost = false, fallback = null, countingDown = false, countT = null;
+  var COUNTDOWN = true, COUNT_S = 5;
+  var LOST_AFTER = 8;          // unmatched words in a row — a proposal, his reads will tune it
+  var endFails = [];           // times the listener ended on its own, for "twice in ten seconds"
+  var cannotListen = false;    // this browser has no listener at all (Firefox, Chrome on an iPhone)
+  // Founder, 2026-09-17: "an option to turn off the voice controls in general,
+  // and just use a timed scroll, with the ability to modify the speed."
+  var TIMED = false, SCROLL_WPS = 2.0, MIRROR = "";
+  function foot(msg){
+    var f = $("foot"), st = $("stage"); if (!f || !st) return;
+    f.textContent = msg || ""; st.dataset.foot = msg ? "1" : "";
+  }
+  function setLost(on){
+    if (on === lost) return;
+    lost = on;
+    foot(on ? "it lost you — keep reading, or say “" + NAME + ", take that again”" : "");
+    log(on ? "LOST — " + LOST_AFTER + " words matched nothing" : "found again");
+    markRails(activeCut(), false);
+  }
+  // Words per second, measured from the words heard this session; the pace
+  // the fallback moves at. Nothing heard yet → two a second, and it says so.
+  var paceMarks = [];
+  function paceWps(){
+    if (paceMarks.length < 6) return { wps: 2.0, measured: false };
+    var secs = 0, n = 0;
+    for (var i = 1; i < paceMarks.length; i++){ var g = paceMarks[i] - paceMarks[i-1]; if (g <= 4000){ secs += g / 1000; n++; } }
+    return secs > 0 ? { wps: Math.max(0.8, Math.min(5, n / secs)), measured: true } : { wps: 2.0, measured: false };
+  }
+  // THE FIXED-SPEED ADVANCE (F-8): the listener is dead, so the words move
+  // on their own at his measured pace. Holds at every cut boundary like the
+  // voice does; one tap pauses and resumes — the one control that may be a
+  // touch, because the voice is gone.
+  function startFallback(why, wpsOverride){
+    if (fallback) return;
+    var p = wpsOverride ? { wps: wpsOverride, measured: false } : paceWps();
+    fallback = { wps: p.wps, paused: false, timer: null, why: why };
+    // The foot names the reason: a chosen set speed is not a failure.
+    foot(TIMED ? "set speed · " + p.wps.toFixed(1) + " words a second · tap to pause"
+       : (cannotListen ? "this browser cannot listen — " : "it stopped hearing — ") + "moving at " + (p.measured ? "your" : "a set") + " pace · tap to pause");
+    log("FALLBACK (" + why + ") — " + p.wps.toFixed(1) + " words/s" + (p.measured ? " measured" : " default"));
+    if (rec && running) try { rec.stop(); } catch(e){}
+    wantRunning = wantRunning || true;
+    function tick(){
+      if (!fallback) return;
+      if (!fallback.paused && !isHeld() && pos < flat.length && !countingDown){
+        var at = pos; advance(flat[at].norm);
+        if (pos === at) pos = at + 1;   // never stick: the script's own word always counts
+        paint();
+      } else if (fallback && isHeld() && !fallback.paused){
+        fallback.paused = true; foot("end of the cut — tap to go on"); paint();
+      }
+      fallback.timer = setTimeout(tick, 1000 / fallback.wps);
+    }
+    fallback.timer = setTimeout(tick, 1000 / fallback.wps);
+    paint();
+  }
+  function stopFallback(){
+    if (!fallback) return;
+    clearTimeout(fallback.timer); fallback = null; foot("");
+    paint();
+  }
+  function tapStage(){
+    if (!fallback) return;
+    if (fallback.paused && isHeld()) releasedBoundary = cutOf(pos);
+    fallback.paused = !fallback.paused;
+    foot(fallback.paused ? "paused — tap to go on" : "moving at " + fallback.wps.toFixed(1) + " words a second · tap to pause");
+    log("fallback " + (fallback.paused ? "paused" : "resumed"));
+  }
+  // THE COUNTDOWN (F-4): five seconds, fixed, switchable. Words heard during
+  // it are ignored — the listener is warming, not reading.
+  function startCountdown(done){
+    var c = $("count"), st = $("stage"); if (!c || !st){ done(); return; }
+    var n = COUNT_S; countingDown = true; st.dataset.count = "1";
+    c.querySelector(".n").style.fontSize = Math.round(st.clientHeight * 0.42) + "px";
+    c.querySelector(".n").textContent = n;
+    c.querySelector(".w").textContent = "walk to where you will stand";
+    clearInterval(countT);
+    countT = setInterval(function(){
+      n--;
+      if (n <= 0){ clearInterval(countT); countingDown = false; st.dataset.count = ""; log("countdown over — reading"); done(); return; }
+      c.querySelector(".n").textContent = n;
+      if (n === 1) c.querySelector(".w").textContent = "the words are next";
+    }, 1000);
+    log("countdown " + COUNT_S + " s");
+  }
+  function cancelCountdown(){ clearInterval(countT); countingDown = false; var st = $("stage"); if (st) st.dataset.count = ""; }
+
+  // Settings live on the device (F-13): his eyes at his distance do not
+  // change when the script does.
+  var SETTINGS_KEY = "prompter.settings";
+  function saveSettings(){
+    try { localStorage.setItem(SETTINGS_KEY, JSON.stringify({ size: textScale, lead: LEAD, width: +$("width").value,
+      readline: Math.round(READ_FRAC * 100), sweep: sweep, countdown: COUNTDOWN, timed: TIMED, wps: SCROLL_WPS, mirror: MIRROR,
+      face: FACE, lh: FACE_LH, ls: FACE_LS })); } catch(e){}
+  }
+  function loadSettings(){
+    var s = null; try { s = JSON.parse(localStorage.getItem(SETTINGS_KEY) || "null"); } catch(e){}
+    if (!s) return false;
+    if (s.size){ textScale = +s.size; $("size").value = textScale; $("sizeOut").textContent = textScale.toFixed(2) + "×"; }
+    if (s.lead){ LEAD = +s.lead; $("lead").value = LEAD; $("leadOut").textContent = LEAD + (LEAD === 1 ? " word" : " words"); }
+    if (s.width){ $("width").value = s.width; scriptEl.style.maxWidth = s.width + "ch"; scriptEl.style.marginInline = "auto"; $("widthOut").textContent = s.width + " letters"; }
+    if (s.readline){ READ_FRAC = s.readline / 100; $("readline").value = s.readline; $("readlineOut").textContent = s.readline + "% down"; }
+    if (typeof s.countdown === "boolean"){ COUNTDOWN = s.countdown; }
+    if (typeof s.timed === "boolean") setTimed(s.timed);
+    if (s.wps){ SCROLL_WPS = +s.wps; $("wps").value = SCROLL_WPS; $("wpsOut").textContent = SCROLL_WPS.toFixed(1) + " words a second"; }
+    if (typeof s.mirror === "string") setMirror(s.mirror);
+    if (typeof s.face === "string") setFace(s.face);
+    if (s.lh) setFaceLh(s.lh);
+    if (typeof s.ls === "number") setFaceLs(s.ls);
+    if (typeof s.sweep === "boolean" && s.sweep !== sweep) setSweep(s.sweep);
+    var cb = $("countdown"); if (cb){ cb.setAttribute("aria-pressed", COUNTDOWN ? "true" : "false"); cb.textContent = COUNTDOWN ? "On · " + COUNT_S + " seconds" : "Off"; }
+    return true;
+  }
+
+  function advance(word){
+    if (countingDown) return;   // the listener is warming; nothing said yet counts
+    if (fallback && !word) return;
+    tail.push(word); if (tail.length > 24) tail.shift();
+    // READING ONLY: a short hop forward, enough to forgive a dropped or
+    // altered word. Anything further is a relocation, and relocations are the
+    // re-anchor's decision — it sees the whole window and leans backward.
+    // A word finished past on silence, arriving late: it was heard after all.
+    for (var u = 0; u < unheardTail.length; u++){
+      if (same(flat[unheardTail[u]].norm, word)){
+        var lt = lastClosedTake(), rawU = flat[unheardTail[u]].raw;
+        if (lt && lt.unheard){ lt.unheard = lt.unheard.filter(function(r){ return r !== rawU; }); if (!lt.unheard.length) lt.unheard = null; lt.heard++; }
+        unheardTail.splice(0, u + 1);
+        log("late word “" + rawU + "” heard after the cut was finished");
+        paint(); return;
+      }
+    }
+    var held = isHeld(), here = held ? activeCut() : -1;
+    var limit = Math.min(pos + NEAR_JUMP + 1, flat.length);
+    for (var j=pos;j<limit;j++){
+      if (same(flat[j].norm, word)){
+        // Crossing a cut boundary by READING takes two matched words in a row,
+        // not one: a stray "so" in the gap is not the start of a take (found
+        // 2026-09-17 — chatter released the hold into cut 4). A command still
+        // releases on its own; this gate is only for words.
+        if (held && cutOf(j) !== here){
+          if (pendingCross < 0 || j < pendingCross + 1 || j > pendingCross + 1 + NEAR_JUMP){
+            pendingCross = j; pendingCrossAt = Math.round(performance.now() - t0); return;
+          }
+          // The take's clock starts at the FIRST word, though the release is
+          // only confirmed on the second (founder, 2026-09-17, G-4: "aware of
+          // starting to record at the first word, but only confirming after
+          // the two words").
+          openTakeFor(cutOf(j), pendingCrossAt);
+          heardWord(pendingCross);
+        }
+        pendingCross = -1;
+        // "act at once, and hold an undo": carrying on from where he was
+        // undoes a command he did not mean (ruling V-6).
+        if (undoPos >= 0 && performance.now() < undoUntil &&
+            Math.abs(j - undoPos) <= NEAR_JUMP + 1 && Math.abs(j - pos) > NEAR_JUMP + 1){
+          log("UNDO — carried on from the abandoned place, " + pos + " → " + undoPos);
+          pos = undoPos; undoPos = -1; lastBlock = -1;
+        }
+        heardWord(j);
+        unheardTail.length = 0;
+        if (!fallback) paceMarks.push(performance.now());
+        setLost(false);
+        pos = j+1; misses = 0; offTail.length = 0;
+        // The cut's last word: the take is whole, and the hold arrives.
+        if (j === lastWordOf(flat[j].cut)) closeTake("to the end");
+        paint(); return;
+      }
+    }
+    pendingCross = -1;
+    misses++;
+    offTail.push(word); if (offTail.length > 8) offTail.shift();
+    if (commandHeard()) return;
+    // It lost him: a run of words matching nothing, mid-cut. Said at the foot;
+    // the words never move on a guess (F-7, on the bench for his ruling).
+    if (!held && pos < flat.length && offTail.length >= LOST_AFTER) setLost(true);
+    // An unknown phrase in the gap is NOT echoed (ruled 2026-09-17, G-6: "the
+    // hint line is enough"). It stays in the raw events for tuning the phrases.
+    if ((held || pos >= flat.length) && !startsACommand()) log("in the gap, not a phrase: “" + offTail.join(" ") + "”");
+    if (misses >= REANCHOR_MISS) reanchor();
+  }
+
+  // ------------------------------------------------------------ the readout
+  function quantile(arr, q){
+    if (!arr.length) return null;
+    var s = arr.slice().sort(function(a,b){ return a-b; });
+    return s[Math.min(s.length-1, Math.floor(q * (s.length-1)))];
+  }
+  function cell(k,v,sub,flag){
+    return '<div class="cell"' + (flag ? ' data-flag="'+flag+'"' : '') + '><dt>'+k+'</dt><dd>'+v+
+           (sub ? ' <small>'+sub+'</small>' : '')+'</dd></div>';
+  }
+  function render(){
+    var pct = flat.length ? Math.round(pos/flat.length*100) : 0;
+    readoutEl.innerHTML =
+      cell("Words matched", pos, "of "+flat.length+" · "+pct+"%") +
+      cell("Live partials", m.interim, "interim results", m.interim ? "good" : (m.final ? "bad" : "")) +
+      cell("Settled results", m.final, "final results") +
+      cell("Stopped on its own", m.restarts, m.restarts === 1 ? "time" : "times", m.restarts > 1 ? "bad" : (m.started ? "good" : "")) +
+      cell("Typical gap", quantile(m.gaps,.5) == null ? "—" : quantile(m.gaps,.5), "ms between results", (quantile(m.gaps,.5)||0) > 600 ? "bad" : (m.gaps.length ? "good" : "")) +
+      cell("Slowest 1 in 10", quantile(m.gaps,.9) == null ? "—" : quantile(m.gaps,.9), "ms", (quantile(m.gaps,.9)||0) > 1200 ? "bad" : (m.gaps.length ? "good" : "")) +
+      cell("Jumped back", m.reanchorBack, "restarts caught", m.reanchorBack ? "good" : "") +
+      cell("Jumped ahead", m.reanchorFwd, "skips caught") +
+      // Measured from pressing start, so it INCLUDES however long he waited
+      // before speaking — 8,269 ms on 2026-09-17 was eight seconds of his own
+      // silence. iOS reports "speech detected" with the first result, so the
+      // listener's own lag cannot be separated from his wait here.
+      cell("First result after start", m.firstResultLag == null ? "—" : m.firstResultLag, m.firstResultLag == null ? "" : "ms · includes your own wait");
+  }
+
+  function say(kind,label,html){
+    var d = document.createElement("div");
+    d.className = "v"; d.dataset.k = kind;
+    d.innerHTML = '<i>'+label+'</i><span>'+html+'</span>';
+    verdictEl.appendChild(d);
+  }
+  function verdicts(){
+    verdictEl.textContent = "";
+    var errs = Object.keys(m.errors);
+    if (!m.started){ say("","waiting","Nothing has been recorded yet."); return; }
+    if (m.interim === 0 && m.final === 0){
+      say("bad","silent","<b>This browser heard nothing at all.</b> Recognition started and never returned a "+
+        "word. If the raw events below show an error, that error is the answer; if they show nothing, this is "+
+        "the documented iOS failure where the first attempt returns silence.");
+    } else if (m.interim === 0){
+      say("bad","no fill","<b>Only finished sentences arrived — no live partials.</b> A word-by-word fill cannot "+
+        "run on that: the highlight would jump a whole sentence at a time, seconds after you said it. This is "+
+        "exactly the throttling WebKit is reported to do.");
+    } else {
+      say("ok","fill works","<b>Live partials arrived "+m.interim+" times.</b> A word-by-word fill can run on "+
+        "this, which is the one thing the research doubted.");
+    }
+    if (m.restarts > 1){
+      say("bad","unstable","<b>Recognition stopped on its own "+m.restarts+" times</b> and had to be restarted. "+
+        "This is the failure that leaves you frozen mid-sentence in front of the camera. More than once in a "+
+        "short read means this phone should not be doing the listening.");
+    } else if (m.restarts === 1){
+      say("","one drop","Recognition stopped once and recovered. Worth noting, not yet disqualifying.");
+    } else {
+      say("ok","stable","<b>It never stopped on its own.</b>");
+    }
+    if (m.reanchorBack > 0){
+      say("ok","restart caught","<b>The words jumped back "+m.reanchorBack+" time"+(m.reanchorBack>1?"s":"")+
+        ".</b> That is your restart working — the thing no product in the market does properly.");
+    } else {
+      say("","no restart seen","No backward jump was recorded. Either you did not restart a cut, or the tracker "+
+        "did not catch it. If you did restart one, that is the finding, and the constants need tuning.");
+    }
+    if (errs.length) say("bad","errors","The browser reported: <b>"+errs.join(", ")+"</b>.");
+    var med = quantile(m.gaps,.5), p90 = quantile(m.gaps,.9);
+    if (med != null){
+      if (med > 600){
+        say("bad","lag","<b>The typical gap between results was "+med+" ms</b>, with one in ten slower than "+
+          p90+" ms. Past roughly half a second the fill is visibly behind your mouth.");
+      } else {
+        say("ok","keeping up","<b>The typical gap between results was "+med+" ms</b>, one in ten slower than "+
+          p90+" ms. That is fast enough for the fill to track your mouth.");
+      }
+    }
+  }
+
+  // ------------------------------------------------- on the device, or not
+  // Ruled 2026-09-17 (P-5): ask for on-device recognition where the browser
+  // has it, and SAY which one was granted. Chrome 139 and later can recognise
+  // locally, and then no audio leaves the machine; everywhere else the browser
+  // sends it to its own maker. Asking is inert where the API does not exist.
+  //
+  // `processLocally = true` is a REQUIREMENT, not a preference — set it when
+  // the pack is only downloadable and recognition fails outright. So it is set
+  // on exactly one answer, "available", and the download is offered as a
+  // control rather than started behind the user's back mid-shoot.
+  var ONDEVICE = "unknown";   // unknown · none · unavailable · downloadable · downloading · available
+
+  function whoHears(){
+    var ua = navigator.userAgent;
+    if (/Edg\//.test(ua)) return "Microsoft";
+    if (/Chrome|CriOS/.test(ua)) return "Google";
+    if (/Safari/.test(ua)) return "Apple";
+    return "your browser\u2019s maker";
+  }
+
+  function probeOnDevice(){
+    var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SR || typeof SR.available !== "function"){ ONDEVICE = "none"; renderPrivacy(); return; }
+    try {
+      SR.available({ langs: ["en-US"], processLocally: true }).then(function(r){
+        ONDEVICE = String(r); log("on-device recognition: " + ONDEVICE); renderPrivacy();
+      }, function(e){ ONDEVICE = "none"; log("on-device probe refused: " + (e && e.name)); renderPrivacy(); });
+    } catch (e){ ONDEVICE = "none"; renderPrivacy(); }
+  }
+
+  function installOnDevice(btn){
+    var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SR || typeof SR.install !== "function") return;
+    btn.disabled = true; btn.textContent = "Downloading\u2026"; ONDEVICE = "downloading"; renderPrivacy();
+    SR.install({ langs: ["en-US"], processLocally: true }).then(function(ok){
+      ONDEVICE = ok ? "available" : "downloadable";
+      log("on-device install " + (ok ? "succeeded" : "failed"));
+      renderPrivacy();
+    }, function(e){ ONDEVICE = "downloadable"; log("on-device install refused: " + (e && e.name)); renderPrivacy(); });
+  }
+
+  function renderPrivacy(){
+    var el = $("privacy"); if (!el) return;
+    var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    var head = "<b>Your script never leaves this browser.</b> It is not sent to us, and it is still here when you " +
+               "come back. ";
+    var tail, offer = false;
+    if (!SR || cannotListen){
+      tail = "This browser has no speech recognition, so nothing listens at all: the words move at a set pace and " +
+             "your microphone is never opened.";
+    } else if (ONDEVICE === "available"){
+      tail = "Your voice is recognised <b>on this device</b> \u2014 the sound never leaves it, and we never receive it.";
+    } else if (ONDEVICE === "downloading"){
+      tail = "The sound of your voice is going to " + whoHears() + " to be turned into words; we never receive it. " +
+             "A language pack is downloading now, and once it lands your voice stays on this device.";
+    } else if (ONDEVICE === "downloadable"){
+      tail = "The sound of your voice is sent to " + whoHears() + " to be turned into words; we never receive it and " +
+             "never record it. <b>This browser can do that on the device instead</b>, once it has downloaded the words " +
+             "it needs.";
+      offer = true;
+    } else {
+      tail = "To follow along, the page uses your browser\u2019s own speech recognition: the sound of your voice is " +
+             "sent to " + whoHears() + " to be turned into words. We never receive it and never record it.";
+    }
+    el.innerHTML = head + tail;
+    if (offer){
+      var b = document.createElement("button");
+      b.type = "button"; b.id = "keeplocal"; b.textContent = "Keep my voice on this device";
+      b.addEventListener("click", function(){ installOnDevice(b); });
+      el.appendChild(document.createElement("br")); el.appendChild(b);
+    }
+  }
+
+  // --------------------------------------------------------- the microphone
+  // Runs ON LOAD, not behind a button. Two runs were already burned on a
+  // browser that could never have worked; the page has to say so before it
+  // asks for anything.
+  function preflight(pre){
+    var el = $("pre"); el.textContent = "";
+    function pre_say(k,l,h){
+      var d = document.createElement("div"); d.className = "v"; d.dataset.k = k;
+      d.innerHTML = '<i>'+l+'</i><span>'+h+'</span>'; el.appendChild(d);
+    }
+    var secure = window.isSecureContext;
+    var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    var ua = navigator.userAgent;
+    var iOS = /iPhone|iPad/.test(ua) || (/Macintosh/.test(ua) && (navigator.maxTouchPoints||0) > 1);
+    var iosNotSafari = iOS && /CriOS|FxiOS|EdgiOS|OPiOS/.test(ua);
+
+    if (!secure){
+      var proto = location.protocol, host = location.host || "(a local file)";
+      pre_say("bad","stop","<b>This address cannot use the microphone.</b> Browsers only let a secure page — one whose "+
+        "address starts with <b>https</b> — hear you. This page came from <b>" + esc(proto + "//" + host) + "</b>" +
+        (proto === "http:"
+          ? ". Open the same address with <b>https</b> at the front."
+          : (proto === "file:"
+            ? ", a file opened from storage. It has to be opened from a web address."
+            : ", which cannot be secure.")) +
+        " Nothing is wrong with your phone.");
+      return false;
+    }
+    if (iosNotSafari){
+      pre_say("bad","wrong browser","<b>On an iPhone only Safari can listen.</b> Apple makes every iPhone browser "+
+        "use Safari's engine, and that engine does not lend its recognition to Chrome, Firefox or Edge. "+
+        "<b>Open this same address in Safari</b> — or start anyway, and the words will move at a set pace.");
+      cannotListen = true; $("go").disabled = false; $("go").textContent = "Start anyway — at a set pace";
+      return false;
+    }
+    if (!SR){
+      pre_say("bad","cannot listen", iOS
+        ? "<b>This iPhone's Safari does not expose speech recognition.</b> It has existed since iOS 14.5, so an "+
+          "older iOS is the first thing to check. You can start anyway: the words will move at a set pace."
+        : "<b>This browser cannot listen</b> — Firefox keeps its recognition switched off. The words will move on "+
+          "their own at a set pace instead; Chrome, Edge or Safari can follow your voice at this same address.");
+      cannotListen = true; $("go").disabled = false; $("go").textContent = "Start anyway — at a set pace";
+      return false;
+    }
+    pre_say("ok","ready","<b>Secure page, and this browser has speech recognition.</b> Nothing structural is in the way.");
+    if (iOS){
+      pre_say("","one setting","If the microphone is granted and no words ever arrive, check "+
+        "<b>Settings → General → Keyboard → Enable Dictation</b>. On some iPhones the web's speech recognition "+
+        "quietly uses the same subsystem, and it returns silence rather than an error when Dictation is off.");
+    }
+    return true;
+  }
+
+  var micGranted = false;
+  function askMic(after){
+    var el = $("pre");
+    function pre_say(k,l,h){
+      var d = document.createElement("div"); d.className = "v"; d.dataset.k = k;
+      d.innerHTML = '<i>'+l+'</i><span>'+h+'</span>'; el.appendChild(d);
+    }
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
+      pre_say("bad","no mic api","This browser exposes no way to ask for a microphone."); return;
+    }
+    navigator.mediaDevices.getUserMedia({ audio:true }).then(function(st){
+      // Hold it open for a moment: warming the microphone is the documented
+      // way round iOS returning nothing on a first attempt.
+      setTimeout(function(){ st.getTracks().forEach(function(t){ t.stop(); }); }, 900);
+      pre_say("ok","mic granted","<b>The microphone was granted.</b> Anything that goes wrong from here is about "+
+        "the recognition, not about permission.");
+      micGranted = true; $("go").disabled = false; $("reset").disabled = false;
+      var ml0 = $("micline"); if (ml0) ml0.style.display = "none";
+      log("getUserMedia granted");
+      if (after) after();
+    }).catch(function(e){
+      var n = e && e.name || "unknown";
+      var why = n === "NotAllowedError"
+        ? "<b>The microphone was refused.</b> If a question appeared and you said no, reload the page and allow it. "+
+          "If no question appeared: in Safari, tap the <b>aA</b> button in the address bar → Website Settings → "+
+          "Microphone → Allow. In Chrome, tap the lock by the address → Site settings → Microphone."
+        : n === "NotFoundError" ? "<b>No microphone was found on this device.</b>"
+        : n === "SecurityError" ? "<b>The browser blocked the microphone for security reasons.</b> Open the page from a secure (https) address."
+        : "<b>The microphone could not be reached ("+n+").</b> Close any other app that is recording, and try again.";
+      pre_say("bad","mic refused", why);
+      var ml = $("micline"); if (ml){ ml.innerHTML = why + " Or start anyway — the words will move at a set pace."; ml.style.display = "block"; }
+      log("getUserMedia failed: " + n);
+    });
+  }
+
+  $("check").addEventListener("click", function(){ if (preflight()) askMic(); });
+
+  // ------------------------------------------------------------- recognition
+  function start(){
+    var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SR) return;
+    rec = new SR();
+    rec.continuous = true; rec.interimResults = true; rec.lang = "en-US"; rec.maxAlternatives = 1;
+    // Only on "available": asking for local when the pack is merely
+    // downloadable fails the session outright (P-5).
+    if (ONDEVICE === "available"){ try { rec.processLocally = true; log("recognising on the device"); } catch (e){ log("processLocally refused: " + (e && e.name)); } }
+    var seen = 0, startedAt = performance.now();
+    speaking = false;
+
+    rec.onstart = function(){ running = true; m.started++; log("recognition started"); };
+    rec.onaudiostart = function(){ log("audio started"); };
+    rec.onspeechstart = function(){ speaking = true; m.lastResultAt = performance.now(); log("speech detected"); };
+    rec.onspeechend = function(){ speaking = false; log("speech ended"); };
+
+    rec.onresult = function(ev){
+      var now = performance.now();
+      if (m.firstResultLag == null) m.firstResultLag = Math.round(now - startedAt);
+      if (m.lastResultAt){
+        var gap = Math.round(now - m.lastResultAt);
+        // Gaps longer than four seconds are pauses, not the recogniser; they
+        // are kept out of the distribution and counted separately.
+        if (gap <= 4000) m.gaps.push(gap); else m.pauses++;
+        if (gap > m.longestGap) m.longestGap = gap;
+      }
+      m.lastResultAt = now;
+      for (var i = ev.resultIndex; i < ev.results.length; i++){
+        var r = ev.results[i];
+        var words = norm(r[0].transcript);
+        if (r.isFinal){
+          m.final++;
+          for (var k = seen; k < words.length; k++) advance(words[k]);
+          seen = 0;
+          log("final: " + r[0].transcript.trim());
+          if (commandFromFinal(words)) log("command read from the corrected final");
+        } else {
+          m.interim++;
+          for (var j = seen; j < words.length; j++) advance(words[j]);
+          seen = words.length;
+        }
+      }
+      render();
+    };
+
+    rec.onerror = function(ev){
+      m.errors[ev.error] = (m.errors[ev.error] || 0) + 1;
+      log("ERROR: " + ev.error);
+      // A listener that cannot come back hands over at once (F-8).
+      if (/not-allowed|service-not-allowed|audio-capture|network/.test(ev.error) && wantRunning){ wantRunning = true; startFallback("listener error: " + ev.error); }
+      if (REMEDY[ev.error] && !m.toldAbout[ev.error]){
+        m.toldAbout[ev.error] = 1;
+        var d = document.createElement("div"); d.className = "v"; d.dataset.k = "bad";
+        d.innerHTML = "<i>" + ev.error + "</i><span>" + REMEDY[ev.error] + "</span>";
+        $("pre").appendChild(d);
+      }
+      render();
+    };
+
+    rec.onend = function(){
+      running = false;
+      log("recognition ended");
+      if (wantRunning && !fallback){
+        m.restarts++;
+        log("it ended on its own — restarting (" + m.restarts + ")");
+        // Twice inside ten seconds and it is dead: the words move on their own
+        // at his pace (F-8, ruled 2026-09-17; the "two in ten" is a proposal).
+        var now = performance.now(); endFails.push(now); endFails = endFails.filter(function(t){ return now - t < 10000; });
+        if (endFails.length >= 2){ startFallback("the listener ended twice in ten seconds"); return; }
+        // The log says so: a take whose listening dropped may be missing words
+        // through no fault of his, and a gap that lost its ears says so too.
+        if (openTake) openTake.dropped = true;
+        else notice("listening again — the first words may take a moment", "heard");
+        setTimeout(function(){ if (wantRunning) { try { rec.start(); } catch(e){ log("restart threw: "+e.message); } } }, 120);
+      }
+      render();
+    };
+
+    try { rec.start(); } catch(e){ log("start threw: " + e.message); }
+  }
+
+  $("go").addEventListener("click", function(){
+    var b = this;
+    if (!wantRunning){
+      if (!micGranted && !cannotListen && !TIMED){ askMic(function(){ b.click(); }); return; }
+      m = blankMetrics(); verdictEl.textContent = "";
+      wantRunning = true; b.dataset.live = "1"; b.textContent = "Stop";
+      if (typeof show === "function") show("read");
+      endFails = []; paceMarks = []; setLost(false);
+      // The door (F-1): a browser with no listener still prompts, at a set pace.
+      var begin = TIMED ? function(){ startFallback("set speed", SCROLL_WPS); }
+                : cannotListen ? function(){ startFallback("this browser cannot listen"); } : function(){};
+      if (!cannotListen && !TIMED) start();          // the listener warms while the count runs
+      if (COUNTDOWN) startCountdown(begin); else begin();
+      if (navigator.wakeLock){
+        navigator.wakeLock.request("screen").then(function(s){ wake = s; log("screen wake lock held"); })
+          .catch(function(e){ log("wake lock refused: " + (e && e.name)); say("bad","screen may sleep","<b>This browser refused to hold the screen awake.</b> A prompter that dims mid-take is unusable, so this is a finding in itself."); });
+      } else { log("no wake lock api"); }
+    } else {
+      stopSession("ended when you stopped");
+    }
+  });
+  // ONE way a session ends, whether by the button or by voice.
+  var lastLayoutText = "";
+  function stopSession(how){
+    var b = $("go");
+    // The layout is read while the stage is still on screen; the end screen
+    // hides it, and a report copied there measured "stage 0px · 1 line".
+    try { lastLayoutText = layoutReport(); } catch(e){}
+    wantRunning = false; b.dataset.live = "0"; b.textContent = TIMED ? "Start — at a set speed" : cannotListen ? "Start anyway — at a set pace" : "Start reading";
+    m.stopped++;
+    cancelCountdown(); stopFallback(); setLost(false);
+    if (openTake) closeTake(how, flat[pos] ? flat[pos].raw : null);
+    if (rec) try { rec.stop(); } catch(e){}
+    if (wake) { try { wake.release(); } catch(e){} wake = null; }
+    log("session ended — " + how);
+    paintGap();
+    verdicts();
+    if (typeof show === "function" && $("app").dataset.screen === "read") show("end");
+  }
+
+  function setSweep(on){
+    sweep = !!on;
+    var a = $("mode-sweep"), b = $("mode-held");
+    if (a) a.setAttribute("aria-pressed", sweep ? "true" : "false");
+    if (b) b.setAttribute("aria-pressed", sweep ? "false" : "true");
+    $("stage").dataset.mode = sweep ? "sweep" : "held";
+    if (!sweep){
+      scriptEl.style.transform = "";
+      flat.forEach(function(w){ w.el.classList.remove("above"); });
+    }
+    lastSent = -1; lastCut = -1; lastBlock = -1;
+    if (sweep) measureLines();
+    paint();
+  }
+  var FACE = "", FACE_LH = 1.38, FACE_LS = -0.012;
+  function setFace(f){
+    FACE = (f === "atkinson" || f === "lexend" || f === "inter") ? f : "";
+    $("stage").dataset.face = FACE;
+    [["face-default", ""], ["face-atkinson", "atkinson"], ["face-lexend", "lexend"], ["face-inter", "inter"]].forEach(function(pair){ var b = $(pair[0]); if (b) b.setAttribute("aria-pressed", FACE === pair[1] ? "true" : "false"); });
+    // A typeface arriving late moves every line; measure again once it has.
+    if (document.fonts && document.fonts.load){
+      var fam = FACE === "atkinson" ? "Atkinson Hyperlegible" : FACE === "lexend" ? "Lexend" : FACE === "inter" ? "Inter" : "Instrument Sans";
+      document.fonts.load('600 32px "' + fam + '"').then(function(){ relayout(); if (app.dataset.screen === "check") renderCheck(); }).catch(function(){});
+    }
+    relayout();
+  }
+  function setFaceLh(v){ FACE_LH = Math.max(1.2, Math.min(1.7, +v || 1.38)); $("stage").style.setProperty("--face-lh", FACE_LH); $("lh").value = FACE_LH; $("lhOut").textContent = FACE_LH.toFixed(2); relayout(); }
+  function setFaceLs(v){ FACE_LS = Math.max(-0.02, Math.min(0.06, +v)); if (isNaN(FACE_LS)) FACE_LS = -0.012; $("stage").style.setProperty("--face-ls", FACE_LS + "em"); $("ls").value = FACE_LS; $("lsOut").textContent = (FACE_LS < 0 ? "−" : "+") + Math.abs(FACE_LS).toFixed(3); relayout(); }
+  ["default", "atkinson", "lexend", "inter"].forEach(function(f){ $("face-" + f).addEventListener("click", function(){ setFace(f === "default" ? "" : f); saveSettings(); }); });
+  $("lh").addEventListener("input", function(){ setFaceLh(this.value); saveSettings(); if (app.dataset.screen === "check") renderCheck(); });
+  $("ls").addEventListener("input", function(){ setFaceLs(this.value); saveSettings(); if (app.dataset.screen === "check") renderCheck(); });
+  function setMirror(m){
+    MIRROR = (m === "x" || m === "y") ? m : "";
+    $("stage").dataset.mirror = MIRROR;
+    [["mirror-off", ""], ["mirror-x", "x"], ["mirror-y", "y"]].forEach(function(pair){ var b = $(pair[0]); if (b) b.setAttribute("aria-pressed", MIRROR === pair[1] ? "true" : "false"); });
+  }
+  function setTimed(on){
+    TIMED = !!on;
+    $("follow-voice").setAttribute("aria-pressed", TIMED ? "false" : "true");
+    $("follow-timed").setAttribute("aria-pressed", TIMED ? "true" : "false");
+    $("wpsRow").hidden = !TIMED;
+    $("go").textContent = TIMED ? "Start — at a set speed" : (cannotListen ? "Start anyway — at a set pace" : "Start reading");
+  }
+  $("mirror-off").addEventListener("click", function(){ setMirror(""); saveSettings(); });
+  $("mirror-x").addEventListener("click", function(){ setMirror("x"); saveSettings(); });
+  $("mirror-y").addEventListener("click", function(){ setMirror("y"); saveSettings(); });
+  $("follow-voice").addEventListener("click", function(){ setTimed(false); saveSettings(); });
+  $("follow-timed").addEventListener("click", function(){ setTimed(true); saveSettings(); });
+  $("wps").addEventListener("input", function(){
+    SCROLL_WPS = +this.value; $("wpsOut").textContent = SCROLL_WPS.toFixed(1) + " words a second";
+    if (fallback && TIMED){ fallback.wps = SCROLL_WPS; }
+    saveSettings();
+  });
+  $("mode-sweep").addEventListener("click", function(){ setSweep(true); saveSettings(); });
+  $("mode-held").addEventListener("click", function(){ setSweep(false); saveSettings(); });
+
+  $("reset").addEventListener("click", function(){ pos = 0; misses = 0; tail = []; lastCut = -1; lastSent = -1; paint(); log("position reset"); });
+
+  $("size").addEventListener("input", function(){
+    textScale = +this.value;
+    sizeCuts();
+    document.documentElement.style.setProperty("--band", textScale + "rem");
+    relayout();
+    $("sizeOut").textContent = textScale.toFixed(2) + "×";
+  });
+  $("width").addEventListener("input", function(){
+    scriptEl.style.maxWidth = this.value + "ch";
+    scriptEl.style.marginInline = "auto";
+    scriptEl.style.paddingRight = "0px";
+    relayout();
+    $("widthOut").textContent = this.value + " letters";
+  });
+  $("lead").addEventListener("click", function(){});
+  $("lead").addEventListener("input", function(){
+    LEAD = +this.value;
+    $("leadOut").textContent = LEAD + (LEAD === 1 ? " word" : " words");
+    lastBlock = -1; paint();
+  });
+
+  $("load").addEventListener("click", function(){ build($("src").value || DEFAULT); });
+
+  // ----------------------------------------------------- which device is this
+  // A result that does not say where it came from let a laptop run stand in
+  // for a phone run for a whole day. Never again: the device is measured, shown
+  // at the top, and carried in anything copied out of here.
+  function device(){
+    var ua = navigator.userAgent, tp = navigator.maxTouchPoints || 0;
+    var w = Math.min(screen.width, screen.height), h = Math.max(screen.width, screen.height);
+    var kind = "an unrecognised device", phone = false;
+    if (/iPhone/.test(ua)) { kind = "an iPhone"; phone = true; }
+    else if (/iPad/.test(ua) || (/Macintosh/.test(ua) && tp > 1)) kind = "an iPad";
+    else if (/Macintosh|Mac OS X/.test(ua)) kind = "a Mac — a desktop browser";
+    else if (/Android/.test(ua)) { kind = /Mobile/.test(ua) ? "an Android phone" : "an Android tablet"; phone = /Mobile/.test(ua); }
+    else if (/Windows/.test(ua)) kind = "a Windows PC — a desktop browser";
+    var engine = /CriOS/.test(ua) ? "Chrome" : (/FxiOS/.test(ua) ? "Firefox" : (/Safari/.test(ua) && !/Chrome/.test(ua) ? "Safari" : (/Chrome/.test(ua) ? "Chrome" : "an unrecognised browser")));
+    var standalone = (window.navigator.standalone === true) || (window.matchMedia && window.matchMedia("(display-mode: standalone)").matches);
+    return { kind:kind, phone:phone, engine:engine, w:w, h:h, tp:tp, standalone:standalone,
+             origin: location.protocol + "//" + (location.host || "(local file)"),
+             build: "2026-09-18 04:54 UTC · 3903d47",
+             label: kind + ", in " + engine + (standalone ? ", added to the home screen" : "")
+                    + " · screen " + w + "×" + h
+                    + " · loaded from " + location.protocol + "//" + (location.host || "(local file)") };
+  }
+  var BUILD = "2026-09-18 04:54 UTC · 3903d47";
+  var DEV = device();
+  $("deviceLine").textContent = DEV.label + "  ·  build " + BUILD;
+  var canRun = preflight();
+  window.__canRun = canRun;
+  if (canRun && !DEV.phone){
+    var d = document.createElement("div"); d.className = "v"; d.dataset.k = "bad";
+    d.innerHTML = "<i>wrong device</i><span><b>This is not the phone that will sit behind your camera.</b> "
+      + "It will run, and it will answer a different question — whether <i>this</i> machine can listen. "
+      + "Open the same address on that phone.</span>";
+    $("pre").appendChild(d);
+  }
+
+  function resultText(){
+    var pct = flat.length ? Math.round(pos/flat.length*100) : 0;
+    var lines = [
+      "PROMPTER BENCH TEST — " + new Date().toISOString().slice(0,16).replace("T"," "),
+      "ran on: " + DEV.label,
+      "build: " + BUILD,
+      "secure connection: " + (window.isSecureContext ? "yes" : "NO"),
+      "",
+      "words matched: " + pos + " of " + flat.length + " (" + pct + "%)",
+      "live partials: " + m.interim,
+      "settled results: " + m.final,
+      "stopped on its own: " + m.restarts,
+      "typical gap between results: " + (quantile(m.gaps,.5) == null ? "—" : quantile(m.gaps,.5) + " ms"),
+      "slowest 1 in 10: " + (quantile(m.gaps,.9) == null ? "—" : quantile(m.gaps,.9) + " ms"),
+      "pauses (gaps over 4s, excluded): " + m.pauses,
+      "first result after start (includes your own wait): " + (m.firstResultLag == null ? "—" : m.firstResultLag + " ms"),
+      "jumped back (restarts caught): " + m.reanchorBack,
+      "jumped ahead (skips caught): " + m.reanchorFwd,
+      "errors: " + (Object.keys(m.errors).length ? Object.keys(m.errors).join(", ") : "none"),
+      "",
+      "text size: " + (+$("size").value).toFixed(2) + "×",
+      "run ahead: " + $("lead").value + " words",
+      "column width: " + $("width").value + " characters",
+      "reading line: " + Math.round(READ_FRAC * 100) + "% down"
+    ].join("\n");
+    return lines;
+  }
+  // ONE button (founder, 2026-09-17: "make it so that the copy and paste is
+  // just one button… or checkboxes"): both. Everything ticked, in one block.
+  function everythingText(){
+    var parts = [];
+    if ($("inc_result").checked) parts.push(resultText());
+    if ($("inc_takes").checked) parts.push(takeLogText());
+    if ($("inc_layout").checked) parts.push(($("stage").clientHeight === 0 && lastLayoutText) ? lastLayoutText : layoutReport());
+    if ($("inc_events").checked) parts.push("PROMPTER RAW EVENTS — " + new Date().toISOString().slice(0,16).replace("T"," ") +
+              "\nran on: " + DEV.label + "\nbuild: " + BUILD + "\n\n" + $("log").textContent);
+    return parts.length ? parts.join("\n\n" + "─".repeat(40) + "\n\n") : "nothing ticked";
+  }
+  $("copyall").addEventListener("click", function(){
+    var txt = everythingText();
+    $("out").textContent = txt;
+    $("out").style.userSelect = "all";
+    if (navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(txt).then(function(){
+        var b = $("copyall"); b.textContent = "Copied"; setTimeout(function(){ b.textContent = "Copy the log"; }, 1800);
+      }).catch(function(){ /* the block below is selectable either way */ });
+    }
+  });
+
+  $("stage").dataset.mode = "sweep";
+  window.addEventListener("resize", relayout);
+  window.addEventListener("orientationchange", function(){ setTimeout(relayout, 250); });
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(relayout).catch(function(){});
+  // ---------------------------------------------------- the layout, as numbers
+  // The founder, 2026-09-16: "it would be good if you added some telemetry …
+  // extra ways for you to see the height with the location of each line item."
+  // Impressions cannot be debugged from here; a table of tops and deltas can.
+  function layoutReport(){
+    var st = $("stage"), L = [];
+    var rl = readingLine(st);
+    L.push("PROMPTER LAYOUT — " + new Date().toISOString().slice(0,16).replace("T"," "));
+    L.push("ran on: " + DEV.label);
+    L.push("build: " + BUILD);
+    L.push("text " + textScale.toFixed(2) + "× · column " + $("width").value + " chars · lead " + LEAD +
+           " · stage " + st.clientHeight + "px · mode " + st.dataset.mode);
+    L.push("VISION AREA: rule 1 at " + rl + "px · rule 2 at " + (rl + lineHeightPx()) +
+           "px · bottom at " + (rl + lineHeightPx() * LINES_PER_BLOCK) + "px (line height " + lineHeightPx() + "px)");
+    L.push("");
+    if (!lineTops.length){ L.push("no lines measured"); return L.join("\n"); }
+    var end = endOf();
+    var heights = [];
+    for (var i = 0; i < lineTops.length; i++){
+      var next = (i + 1 < lineTops.length) ? lineTops[i+1] : end;
+      heights.push(Math.round(next - lineTops[i]));
+    }
+    var mn = Math.min.apply(null, heights.slice(0, -1) .length ? heights.slice(0, -1) : heights);
+    var mx = Math.max.apply(null, heights.slice(0, -1).length ? heights.slice(0, -1) : heights);
+    L.push("LINES — " + lineTops.length + " of them; each row is one rendered line");
+    L.push("  #   top   height  first word            last word");
+    for (var j = 0; j < lineTops.length; j++){
+      var first = null, last = null;
+      for (var k = 0; k < flat.length; k++) if (lineOfWord[k] === j){ if (first === null) first = flat[k].raw; last = flat[k].raw; }
+      L.push("  " + String(j).padStart(2) + "  " + String(Math.round(lineTops[j])).padStart(5) + "  " +
+             String(heights[j]).padStart(6) + "  " + String(first || "").padEnd(21).slice(0,21) + " " + (last || ""));
+    }
+    L.push("");
+    L.push("UNIFORM? line heights run " + mn + "–" + mx + "px" +
+           (mx - mn <= 1 ? "  ✓ uniform" : "  ✗ NOT UNIFORM — spread of " + (mx - mn) + "px"));
+    L.push("");
+    L.push("PAIRS — what one sweep should move by");
+    for (var b = 0; b + 1 < lineTops.length; b += LINES_PER_BLOCK){
+      var bottom = (b + LINES_PER_BLOCK < lineTops.length) ? lineTops[b + LINES_PER_BLOCK] : end;
+      L.push("  lines " + b + "-" + Math.min(b+LINES_PER_BLOCK-1, lineTops.length-1) +
+             "  height " + Math.round(bottom - lineTops[b]) + "px" +
+             ((rl + (bottom - lineTops[b])) > st.clientHeight - 8 ? "   ✗ DOES NOT FIT below the reading line" : ""));
+    }
+    L.push("");
+    L.push("SWEEPS THIS RUN — " + sweeps.length);
+    if (!sweeps.length) L.push("  none yet");
+    for (var s = 0; s < sweeps.length; s++){
+      var w = sweeps[s];
+      var adh = w.skipped ? "  (landing not measured — the next sweep came first)"
+        : (w.errA == null && w.errB == null) ? ""
+        : "  landed " + (w.errA == null ? "?" : (w.errA > 0 ? "+" : "") + w.errA) + "px / " +
+          (w.errB == null ? "?" : (w.errB > 0 ? "+" : "") + w.errB) + "px off the two rules" +
+          ((Math.abs(w.errA||0) <= 1 && Math.abs(w.errB||0) <= 1) ? " ✓" : " ✗");
+      L.push("  #" + (s+1) + "  to line " + w.line + "  y " + w.from + " → " + w.toY +
+             "  moved " + w.d + "px  fired on “" + w.word + "”  at " + (w.t/1000).toFixed(1) + "s" + adh);
+    }
+    if (commands.length){
+      L.push("");
+      L.push("COMMANDS HEARD — " + commands.length);
+      for (var m2 = 0; m2 < commands.length; m2++)
+        L.push("  " + commands[m2].id + "  from word " + commands[m2].from + "  at " + (commands[m2].t/1000).toFixed(1) + "s");
+    }
+    if (corrections.length){
+      L.push("");
+      L.push("CORRECTIONS — " + corrections.length + " (a re-measure moved the same pair; snapped, not animated)");
+      for (var c = 0; c < corrections.length; c++)
+        L.push("  line " + corrections[c].line + "  " + corrections[c].d + "px  at " + (corrections[c].t/1000).toFixed(1) + "s");
+    }
+    if (sweeps.length > 1){
+      var ds = sweeps.map(function(x){ return Math.abs(x.d); });
+      var odd = lineTops.length % LINES_PER_BLOCK !== 0;
+      // Judge READING only. A relocation — a restart, a skip, a command — moves
+      // by whatever distance it must, and counting those as uneven reading is a
+      // detector crying on a healthy page.
+      var reading = sweeps.filter(function(x, i){ return i > 0 && x.d === -88 || Math.abs(x.d) === Math.abs(sweeps[1] ? sweeps[1].d : x.d); })
+                          .map(function(x){ return Math.abs(x.d); });
+      var lh = lineHeightPx() * LINES_PER_BLOCK;
+      var stepped = sweeps.filter(function(x){ return Math.abs(x.d) === lh; }).length;
+      var jumped = sweeps.length - stepped - (odd ? 1 : 0);
+      L.push("  distances: " + ds.join(", ") + "px");
+      L.push("  reading sweeps (one pair, " + lh + "px): " + stepped + " of " + sweeps.length +
+             (jumped > 0 ? "   · " + jumped + " relocation" + (jumped>1?"s":"") + " — a restart or a skip, correct at any distance" : "   ✓ all uniform") +
+             (odd ? "   · the last is a half sweep (" + lineTops.length + " lines is odd)" : ""));
+    }
+    return L.join("\n");
+  }
+
+  // The take log, as text. One row per attempt; the facts the tracker can
+  // honestly report and nothing it cannot. The audio side is not built, and
+  // the block says so rather than printing a zero (Bug Class #4).
+  function mmss(ms){ var s = Math.round(ms / 1000); return Math.floor(s / 60) + ":" + String(s % 60).padStart(2, "0"); }
+  function takeLogText(){
+    var L = ["PROMPTER TAKE LOG — " + new Date().toISOString().slice(0,16).replace("T"," "),
+             "ran on: " + DEV.label, "build: " + BUILD, ""];
+    var all = takes.concat(openTake ? [Object.assign({}, openTake, { how: "still open", endedAt: null })] : []);
+    if (!all.length){ L.push("no takes yet — a take exists from its first heard word"); }
+    else {
+      L.push("cut  take  started  ended   heard    how");
+      all.forEach(function(t){
+        L.push("  " + String(t.cut + 1).padStart(2) + "    " + String(t.n).padStart(2) + "   " +
+               mmss(t.startedAt).padStart(6) + "  " + (t.endedAt == null ? "     —" : mmss(t.endedAt).padStart(6)) + "  " +
+               (t.heard + "/" + t.of).padStart(6) + "   " + t.how +
+               (t.stoppedBefore ? " before “" + t.stoppedBefore + "”" : "") +
+               (t.unheard ? " · not heard: " + t.unheard.join(" ") : "") +
+               (t.rewinds ? " · went back " + t.rewinds + (t.rewinds === 1 ? " time" : " times") + " inside it" : "") +
+               (t.dropped ? " · the listening dropped during it" : "") +
+               (t.kept ? "   ★ kept at " + mmss(t.keptAt) : ""));
+      });
+    }
+    L.push("");
+    L.push("Times count from the start of the session. The log records what happened; it never ranks and never picks a best take.");
+    L.push("Not measured yet — it cannot hear these: loudness, pace, pauses, background sound.");
+    return L.join("\n");
+  }
+
+  // A way to drive the tracker without a microphone, so the sweep's arithmetic
+  // can be proven rather than reasoned about. Speaking the script perfectly is
+  // the one case a test can stage; everything else needs a real voice.
+  window.__bench = {
+    // Reads the script in order from where he stands. Sequential on purpose:
+    // crossing a cut takes two matched words, and re-speaking flat[pos] until
+    // it moves would repeat the first of them forever.
+    speak: function(n){ var at = pos; for (var i = 0; i < n && at < flat.length; i++){ advance(flat[at].norm); at++; } return pos; },
+    // Say ARBITRARY words — a restart, a paraphrase, a fumble. The only way to
+    // stage the case the founder keeps hitting without a voice.
+    hear: function(str){ norm(str).forEach(function(w){ advance(w); }); return pos; },
+    pos: function(){ return pos; },
+    lineAt: function(){ return lineOfWord[Math.min(pos, flat.length-1)]; },
+    sweeps: function(){ return sweeps.slice(); },
+    lines: function(){ return { tops: lineTops.slice(), ofWord: lineOfWord.slice() }; },
+    // The between-cuts moment, drivable: the take log, the strip, the hold,
+    // and the silence that finishes a cut whose last word never arrived.
+    takes: function(){ return takes.map(function(t){ return Object.assign({}, t); }); },
+    openTake: function(){ return openTake ? Object.assign({}, openTake) : null; },
+    held: function(){ return isHeld(); },
+    silence: function(){ var r = finishCutEarly("silence"); lastBlock = -1; paint(); return r; },
+    gap: function(){ var g = $("gap"); return { shown: $("stage").dataset.gap === "1",
+      what: g.querySelector(".what").textContent, say: g.querySelector(".say").textContent,
+      kind: g.querySelector(".say").dataset.kind || "", flash: $("cmdflash").textContent, flashOn: $("cmdflash").style.opacity === "1" }; },
+    takeLog: takeLogText,
+    everything: everythingText,
+    now: function(){ return Math.round(performance.now() - t0); },
+    // A listener's corrected final, as the page would receive it.
+    finalHeard: function(str){ return commandFromFinal(norm(str)); },
+    lastLayout: function(){ return lastLayoutText; },
+    // The session's on/off, so a voice ending can be proven without a mic.
+    begin: function(){ wantRunning = true; $("go").dataset.live = "1"; },
+    wantRunning: function(){ return wantRunning; },
+    // The face's other states, drivable: lost, the fallback, the countdown,
+    // the door, the settings on the device.
+    lost: function(){ return lost; },
+    offTail: function(){ return offTail.slice(); },
+    foot: function(){ return $("foot").textContent; },
+    fallback: function(wps){ if (wps === false) stopFallback(); else startFallback("driven", wps || null); return !!fallback; },
+    fallbackState: function(){ return fallback ? { wps: fallback.wps, paused: fallback.paused } : null; },
+    tap: tapStage,
+    countdown: function(){ return { on: COUNTDOWN, counting: countingDown, seconds: COUNT_S, shown: $("stage").dataset.count === "1", n: $("count").querySelector(".n").textContent }; },
+    startCountdown: function(done){ startCountdown(done || function(){}); },
+    cannotListen: function(v){ if (typeof v === "boolean") cannotListen = v; return cannotListen; },
+    timed: function(v){ if (typeof v === "boolean") setTimed(v); return { timed: TIMED, wps: SCROLL_WPS }; },
+    mirror: function(m){ if (typeof m === "string") setMirror(m); return $("stage").dataset.mirror || ""; },
+    face: function(f){ if (typeof f === "string") setFace(f); return { face: FACE, lh: FACE_LH, ls: FACE_LS }; },
+    faceLh: setFaceLh, faceLs: setFaceLs,
+    pressStart: function(){ $("go").click(); },
+    settings: function(){ return JSON.parse(localStorage.getItem(SETTINGS_KEY) || "null"); },
+    readingLine: function(){ return readingLine($("stage")); },
+    pauseBar: function(){ var pb = $("pause"); return { on: pb.dataset.on === "1", scale: pb.style.transform }; },
+    cutSizes: function(){ return cuts.map(function(c){ return c.words.length; }); },
+    load: function(text){ build(text || DEFAULT); },
+    stop: function(){ stopSession("driven"); },
+    reset: function(){ cancelCountdown(); stopFallback(); setLost(false); endFails = []; paceMarks = []; lastCommandAt = -1e9;
+                       pos = 0; misses = 0; tail = []; lastBlock = -1; lastY = 0; releasedBoundary = -1; sweeps.length = 0; corrections.length = 0;
+                       takes.length = 0; openTake = null; unheardTail.length = 0; pendingCross = -1; pendingCrossAt = 0; gapArmed = -1; noticeUntil = 0; offTail.length = 0; pauseBar(0);
+                       $("cmdflash").style.opacity = "0"; $("cmdflash").textContent = "";
+                       scriptEl.style.transform = ""; paint(); }
+  };
+
+  $("readline").addEventListener("input", function(){
+    READ_FRAC = (+this.value) / 100;
+    $("readlineOut").textContent = this.value + "% down";
+    relayout(); saveSettings();
+  });
+  $("countdown").addEventListener("click", function(){
+    COUNTDOWN = !COUNTDOWN;
+    this.setAttribute("aria-pressed", COUNTDOWN ? "true" : "false");
+    this.textContent = COUNTDOWN ? "On · " + COUNT_S + " seconds" : "Off";
+    saveSettings();
+  });
+  ["size", "lead", "width"].forEach(function(id){ $(id).addEventListener("input", saveSettings); });
+  $("stage").addEventListener("click", tapStage);
+
+  // The log, handed over three ways (F-11): copied, downloaded, or shared
+  // through the phone's own sheet.
+  function logFileName(){ return "prompter-take-log-" + new Date().toISOString().slice(0,16).replace(/[T:]/g, "-") + ".txt"; }
+  $("download").addEventListener("click", function(){
+    var txt = everythingText();
+    var a = document.createElement("a");
+    a.href = URL.createObjectURL(new Blob([txt], { type: "text/plain" })); a.download = logFileName();
+    document.body.appendChild(a); a.click(); setTimeout(function(){ URL.revokeObjectURL(a.href); a.remove(); }, 2000);
+    $("out").textContent = txt;
+  });
+  $("share").addEventListener("click", function(){
+    var txt = everythingText();
+    if (navigator.share){
+      navigator.share({ title: "Prompter take log", text: txt }).catch(function(e){ log("share: " + (e && e.name)); });
+    } else {
+      $("out").textContent = "This browser has no share sheet — use Copy or Download.\n\n" + txt;
+    }
+  });
+
+  // The paste opens empty (F-2); the sample is one tap away. The stage is
+  // still built from the sample so the check and the drive hook have words.
+  renderCommandTable();
+  if (loadSettings()) log("settings restored from this device");
+  build(DEFAULT);
+  render();
+  log("device: " + DEV.label);
+
+  // ================================================================ the flow
+  // Built 2026-09-17 off the face sheet's rulings: the paste with a short
+  // intro first (F-2), the check at reading size with the counts (F-3), the
+  // countdown (F-4), the reading face, the end with the log (F-11), and the
+  // settings pane with the phrases and the gates (F-13). The instrument's
+  // readouts live behind "for the maker".
+  var app = $("app");
+  function show(screen){
+    app.dataset.screen = screen;
+    if (screen === "check" || screen === "read"){ relayout(); }
+    if (screen === "check") renderCheck();
+    if (screen === "read") window.scrollTo(0, 0);
+    if (screen === "end") renderEnd();
+  }
+  function screenNow(){ return app.dataset.screen; }
+
+  // The check (F-3): every cut with its line count at the current settings.
+  // Any length is fine (his ruling); only two things can fail to fit, and
+  // both are settings — a pair of lines below the reading line, or one word
+  // wider than the column.
+  function renderCheck(){
+    var list = $("checklist"), counts = $("counts"); if (!list) return;
+    list.innerHTML = "";
+    var st = $("stage"), colW = scriptEl.clientWidth, wide = null;
+    cuts.forEach(function(c, i){
+      var lines = {}, first = "";
+      c.words.forEach(function(w, k){ var ix = flat.indexOf(w); if (lineOfWord[ix] != null) lines[lineOfWord[ix]] = 1; if (!k) first = w.raw; });
+      c.words.forEach(function(w){ if (w.el.offsetWidth > colW + 1) wide = wide || { cut: i + 1, word: w.raw }; });
+      var n = Object.keys(lines).length;
+      // One word per ELEMENT: a contraction holds two slots on one element.
+      var seen = [], text = c.words.filter(function(w){ if (seen.indexOf(w.el) >= 0) return false; seen.push(w.el); return true; })
+                                 .map(function(w){ return w.raw; }).join(" ");
+      var row = document.createElement("div"); row.className = "cutrow";
+      row.innerHTML = '<span class="n">' + (i + 1) + '</span><span class="t"></span><span class="c">' + n + (n === 1 ? " line" : " lines") + ' · ' + c.words.length + ' words</span>';
+      row.querySelector(".t").textContent = text;
+      list.appendChild(row);
+    });
+    counts.textContent = cuts.length + (cuts.length === 1 ? " cut" : " cuts") + " · " + flat.length + " words · " + lineTops.length + " lines";
+    var warn = $("fit");
+    if (warn){
+      var msg = !blockFits ? "Two lines do not fit below the reading line at this size — lower the text size, or move the reading line up."
+              : wide ? "In cut " + wide.cut + " the word “" + wide.word + "” is wider than the column — widen the column or lower the text size." : "";
+      warn.textContent = msg; warn.style.display = msg ? "block" : "none";
+    }
+    var aw = $("awake");
+    if (aw){
+      var can = !!navigator.wakeLock;
+      aw.textContent = can ? "" : "This browser cannot keep the screen awake. Before you roll: iPhone — Settings → Display & Brightness → Auto-Lock → Never. Android — Settings → Display → Screen timeout. Set it back after.";
+      aw.style.display = can ? "none" : "block";
+    }
+  }
+  function renderEnd(){
+    var t = $("endTitle"), l = $("endlog");
+    if (t) t.textContent = "Session ended · " + takes.length + (takes.length === 1 ? " take" : " takes");
+    // The rows as a table that fits a phone: the copied text keeps the
+    // monospace form; on screen the last column wraps instead of scrolling
+    // sideways (measured 561px of rows in a 360px box, 2026-09-17).
+    if (l){
+      if (!takes.length){ l.textContent = "no takes — nothing was heard"; return; }
+      var rows = takes.map(function(t){
+        var how = t.how + (t.stoppedBefore ? " before “" + t.stoppedBefore + "”" : "") + (t.unheard ? " · not heard: " + t.unheard.join(" ") : "") +
+                  (t.rewinds ? " · went back " + t.rewinds + (t.rewinds === 1 ? " time" : " times") : "") + (t.dropped ? " · the listening cut out during it" : "");
+        return '<tr' + (t.kept ? ' class="kept"' : '') + '><td>cut ' + (t.cut + 1) + '<br><span class="tk">take ' + t.n + '</span></td><td>' + mmss(t.startedAt) + '<br><span class="tk">to ' + (t.endedAt == null ? "—" : mmss(t.endedAt)) + '</span></td><td>' + t.heard + '/' + t.of + '</td><td class="how">' + esc(how) + (t.kept ? '<br><span class="star">★ kept at ' + mmss(t.keptAt) + '</span>' : '') + '</td></tr>';
+      });
+      l.innerHTML = '<table class="takes"><tr><th>cut</th><th>when</th><th>words heard</th><th>how it ended</th></tr>' + rows.join("") + '</table>';
+    }
+  }
+  $("load").addEventListener("click", function(){ show("check"); });
+  $("sample").addEventListener("click", function(){ $("src").value = DEFAULT; build(DEFAULT); show("check"); });
+  $("back").addEventListener("click", function(){ show("paste"); });
+  $("again").addEventListener("click", function(){ build($("src").value || DEFAULT); show("check"); });
+  $("newscript").addEventListener("click", function(){ show("paste"); });
+  $("stopbtn").addEventListener("click", function(){ if (wantRunning) stopSession("ended when you stopped"); });
+  $("gear").addEventListener("click", function(){ $("pane").hidden = false; app.dataset.pane = "1"; relayout(); });
+  $("paneclose").addEventListener("click", function(){ $("pane").hidden = true; app.dataset.pane = ""; relayout(); renderCheck(); });
+  ["size", "width", "readline"].forEach(function(id){ $(id).addEventListener("input", function(){ if (screenNow() === "check") renderCheck(); }); });
+
+  // The door (F-1): what the browser check found, on the paste screen, when
+  // it matters — and never when it does not.
+  function renderDoor(){
+    var d = $("door"); if (!d) return;
+    d.innerHTML = (cannotListen || !window.isSecureContext) ? $("pre").innerHTML : "";
+    if (cannotListen){ $("go").textContent = "Start anyway — at a set pace"; }
+  }
+
+  // The phrases (F-13, ruled V-2): two per command, editable, refused when
+  // they appear in the script. COMMANDS is the one owner; the inputs write it.
+  var DEFAULT_PHRASES = COMMANDS.map(function(c){ return c.say.slice(); });
+  function phraseInScript(words){
+    if (!words.length) return false;
+    for (var s = 0; s + words.length <= flat.length; s++){
+      var hit = 0;
+      for (var k = 0; k < words.length; k++) if (flat[s + k].norm === words[k]) hit++;
+      if (hit === words.length) return true;
+    }
+    return false;
+  }
+  function renderPhrases(){
+    var host = $("phrases"); if (!host) return;
+    host.innerHTML = "";
+    COMMANDS.forEach(function(c, i){
+      var row = document.createElement("div"); row.className = "phrase";
+      row.innerHTML = '<span class="lbl">' + esc(c.say[0]) + '</span>' +
+        '<input id="ph-' + c.id + '-0" value="' + esc(c.say[0]) + '" aria-label="first phrase">' +
+        '<input id="ph-' + c.id + '-1" value="' + esc(c.say[1] || "") + '" aria-label="second phrase">' +
+        '<div class="does">' + esc(c.does) + '</div><div class="why" hidden></div>';
+      host.appendChild(row);
+      [0, 1].forEach(function(n){
+        var inp = row.querySelector("#ph-" + c.id + "-" + n);
+        inp.addEventListener("input", function(){
+          var v = inp.value.trim(), words = phraseWords(v), why = row.querySelector(".why");
+          if (!v){ inp.dataset.bad = ""; why.hidden = true; return; }
+          if (phraseInScript(words)){
+            inp.dataset.bad = "1"; why.hidden = false; why.textContent = "“" + v + "” is in your script — it would fire while you read it. Kept: “" + c.say[n] + "”.";
+            return;
+          }
+          inp.dataset.bad = ""; why.hidden = true; why.textContent = "";
+          c.say[n] = v; row.querySelector(".lbl").textContent = c.say[0];
+          renderCommandTable(); saveSettings();
+        });
+      });
+    });
+  }
+  function gateButton(id, get, set){
+    var b = $(id); if (!b) return;
+    b.addEventListener("click", function(){ set(!get()); b.setAttribute("aria-pressed", get() ? "true" : "false"); b.textContent = get() ? "On" : "Off"; saveSettings(); });
+    b.setAttribute("aria-pressed", get() ? "true" : "false"); b.textContent = get() ? "On" : "Off";
+  }
+  gateButton("gate-name", function(){ return GATE_NAME_MIDTAKE; }, function(v){ GATE_NAME_MIDTAKE = v; });
+  gateButton("gate-offscript", function(){ return GATE_OFFSCRIPT; }, function(v){ GATE_OFFSCRIPT = v; });
+  gateButton("gate-ahead", function(){ return GATE_NOT_AHEAD; }, function(v){ GATE_NOT_AHEAD = v; });
+  var _save = saveSettings;
+  saveSettings = function(){
+    _save();
+    try {
+      var s = JSON.parse(localStorage.getItem(SETTINGS_KEY) || "{}");
+      s.phrases = COMMANDS.map(function(c){ return c.say.slice(); });
+      s.gates = { name: GATE_NAME_MIDTAKE, offscript: GATE_OFFSCRIPT, ahead: GATE_NOT_AHEAD };
+      localStorage.setItem(SETTINGS_KEY, JSON.stringify(s));
+    } catch(e){}
+  };
+  (function restoreFlowSettings(){
+    var s = null; try { s = JSON.parse(localStorage.getItem(SETTINGS_KEY) || "null"); } catch(e){}
+    if (!s) return;
+    if (s.phrases && s.phrases.length === COMMANDS.length) COMMANDS.forEach(function(c, i){ if (s.phrases[i] && s.phrases[i][0]) c.say = s.phrases[i].slice(0, 2); });
+    if (s.gates){ GATE_NAME_MIDTAKE = !!s.gates.name; GATE_OFFSCRIPT = !!s.gates.offscript; GATE_NOT_AHEAD = !!s.gates.ahead; }
+    ["gate-name", "gate-offscript", "gate-ahead"].forEach(function(id){ var b = $(id), v = id === "gate-name" ? GATE_NAME_MIDTAKE : id === "gate-offscript" ? GATE_OFFSCRIPT : GATE_NOT_AHEAD; b.setAttribute("aria-pressed", v ? "true" : "false"); b.textContent = v ? "On" : "Off"; });
+    renderCommandTable();
+  })();
+  renderPhrases();
+  renderDoor();
+  // The sentence about the microphone is drawn BEFORE the probe answers, so it
+  // is never absent; the probe redraws it when the browser says which way the
+  // audio is going (P-5).
+  renderPrivacy();
+  probeOnDevice();
+  // A deep link to the settings (#settings) opens the pane on load — for a
+  // measured pass over it, and for a link that says "change your size here".
+  if (location.hash === "#settings"){ $("sample").click(); $("pane").hidden = false; app.dataset.pane = "1"; relayout(); }
+  if (location.hash === "#check"){ $("sample").click(); }
+  window.__bench.flow = {
+    show: show, screen: screenNow, checkRows: function(){ return [].map.call(document.querySelectorAll("#checklist .cutrow"), function(r){ return r.textContent; }); },
+    counts: function(){ return $("counts").textContent; }, fit: function(){ return $("fit").textContent; },
+    // P-5: what the page TELLS the reader about the microphone, and the state
+    // it derived that from. Exposed so a checker can prove the two agree —
+    // the sentence is the claim, ONDEVICE is the evidence.
+    privacy: function(){ return $("privacy").textContent; },
+    ondevice: function(){ return ONDEVICE; },
+    endTitle: function(){ return $("endTitle").textContent; }, endLog: function(){ return $("endlog").textContent; },
+    phrases: function(){ return COMMANDS.map(function(c){ return c.say.slice(); }); },
+    setPhrase: function(id, n, v){ var i = $("ph-" + id + "-" + n); i.value = v; i.dispatchEvent(new Event("input", { bubbles: true })); return { bad: i.dataset.bad === "1", why: i.closest(".phrase").querySelector(".why").textContent }; },
+    gates: function(){ return { name: GATE_NAME_MIDTAKE, offscript: GATE_OFFSCRIPT, ahead: GATE_NOT_AHEAD }; },
+    door: function(){ return $("door").textContent; }
+  };
+
+})();
+</script>
+
+</body>
+</html>
