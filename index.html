@@ -85,7 +85,10 @@
      offset — at a different text size the typed one lands on the wrong words. */
   .demo .row{padding:3px 0}
   .demo .row.at{position:relative;border-top:1px solid var(--line);padding-top:9px;margin-top:6px}
-  .demo .row.at::before{content:"";position:absolute;left:-16px;top:9px;bottom:3px;width:3px;border-radius:2px;background:var(--kind)}
+  /* The mark capped rather than rounded by a typed radius: on a 3px bar the
+     pill token gives the same shape the app's own rail has, and the page keeps
+     to the two radii it declared. */
+  .demo .row.at::before{content:"";position:absolute;left:-16px;top:9px;bottom:3px;width:3px;border-radius:var(--r-pill);background:var(--kind)}
   .demo .said{color:var(--said)} .demo .now{color:var(--lime)} .demo .next{color:var(--paper)} .demo .far{color:var(--t5)}
   .demo figcaption{font-family:var(--mono);font-size:var(--f-micro);letter-spacing:.06em;color:var(--t4);margin-top:16px;line-height:1.7}
   .demo figcaption b{color:var(--t3);font-weight:400}
