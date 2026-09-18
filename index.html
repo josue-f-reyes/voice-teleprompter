@@ -111,6 +111,9 @@
   table.browsers td:first-child{color:var(--paper)}
   table.browsers .yes{color:var(--lime)} table.browsers .no{color:var(--warn)}
 
+  /* The receipt for the table above, at the dress ordinary stakes want: the
+     claim leads, the source sits under it rather than beside every row. */
+  .source{font-family:var(--mono);font-size:var(--f-micro);color:var(--t4);line-height:1.7;max-width:62ch;margin:16px 0 0}
   .faq{display:flex;flex-direction:column;gap:22px}
   .faq h3{color:var(--paper)} .faq p{color:var(--t2);margin:0;max-width:62ch}
 
@@ -124,9 +127,9 @@
   <header class="hero">
     <p class="kicker">free · runs in your browser</p>
     <h1>The words wait for you.</h1>
-    <p class="lede">A teleprompter that <b>listens</b>. It follows the words as you say them, holds at the end of
-      every cut until you are ready, and takes you back to the top when you say <b>&ldquo;take that again&rdquo;</b>.
-      No scroll speed to guess at. Free, no sign-up.</p>
+    <p class="lede">A teleprompter that <b>listens</b>. It follows the words as you say them, waits when you stop,
+      and takes you back to the top when you say <b>&ldquo;take that again&rdquo;</b>. No scroll speed to guess at.
+      Free, no sign-up.</p>
     <a class="cta" href="/app/">Open the teleprompter &rarr;</a>
     <p class="under">works in your browser &middot; nothing to install &middot; your script never leaves it</p>
   </header>
@@ -179,9 +182,9 @@
 
   <section id="commands">
     <h2>What you can say</h2>
-    <p>Spoken while you are reading, hands free. Inside a cut, say <b>&ldquo;prompter&rdquo;</b> first so your own
-      script is never mistaken for an instruction. Between cuts, the plain words are enough. You can change any of
-      these phrases to your own.</p>
+    <p>Spoken while you are reading, hands free. Inside a cut, say <b>&ldquo;prompter&rdquo;</b> first &mdash; that
+      is this tool&rsquo;s own name, short &mdash; so your own script is never mistaken for an instruction. Between
+      cuts, the plain words are enough. You can change any of these phrases to your own.</p>
     <table class="says">
       <tr><td>&ldquo;take that again&rdquo;</td><td>back to the top of this cut, for another attempt</td></tr>
       <tr><td>&ldquo;that&rsquo;s the one&rdquo;</td><td>marks the attempt you just did as the keeper</td></tr>
@@ -203,6 +206,8 @@
       <tr><td>Chrome, Firefox or Edge on an iPhone</td><td class="no">No</td><td>Apple makes every iPhone browser use Safari&rsquo;s engine without its recognition. Open it in Safari.</td></tr>
       <tr><td>Firefox on a computer</td><td class="no">No</td><td>Firefox keeps its speech recognition switched off. The steady pace still works.</td></tr>
     </table>
+    <p class="source">Which browsers can listen is taken from what each browser&rsquo;s makers document, not from our
+      own testing on every device. The one this has been measured on is an iPhone in Safari.</p>
   </section>
 
   <section id="privacy">
