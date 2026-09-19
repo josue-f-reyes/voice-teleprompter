@@ -356,7 +356,7 @@
     <div id="door"></div>
     <textarea id="src" spellcheck="false" placeholder="Paste your script here. Press Enter to start a new cut."></textarea>
     <p class="controls" style="margin-top:11px"><button id="load" class="go">See it as you’ll read it</button>
-      <button id="sample">Use the sample script</button></p>
+      <button id="sample">Read the how-to script</button></p>
     <p id="privacy" class="privacy"></p>
   </section>
 
@@ -511,11 +511,29 @@
   // ---- the published constants, unchanged, so this test measures them too --
   var NEAR_JUMP = 3, LOOKAHEAD = 18, REANCHOR_MISS = 4, REANCHOR_WINDOW = 6, REANCHOR_MIN = 3;
 
+  // The how-to script (founder, 2026-09-19): the sample teaches the tool by
+  // being read. Each cut teaches one thing, and the command it names is said
+  // for real at the pause that follows — the ruled window for a plain phrase.
+  // Three rules its wording obeys, all MEASURED on this page before it was
+  // written (scripts/verify_prompter_bench.mjs proves the ones a test can):
+  //   · a phrase read mid-sentence fires nothing; the words after it keep the
+  //     recogniser's final from ending on it, so no phrase sits before a full
+  //     stop. A phrase as a cut's LAST words fires on the final — never done;
+  //   · no word of any phrase in a cut's first FOUR slots: at a pause, each
+  //     word heard is tried against the next cut's first four slots before
+  //     anything else, and a match is taken as reading — which breaks the
+  //     phrase. "That is the whole thing" swallowed “that's the one”, and
+  //     "And a second" broke “that's a wrap” on its "a", before this was
+  //     measured. The harness says every phrase at every pause, and fails
+  //     on the first that is read instead of obeyed;
+  //   · the name is never followed by a phrase: “prompter, take that again”
+  //     in a script fires while it is read, which is why the settings refuse it.
   var DEFAULT = [
-    "So here's what actually happened. I spent four months building the wrong thing, and the receipt is public.",
-    "Everybody told me to validate first. I thought I had. What I had actually done was ask people whether they liked the idea.",
-    "Liking an idea costs nothing. That's the whole lesson, and it took me a quarter to learn it.",
-    "So here is the question I ask now, before I write a single line of anything."
+    "Read this out loud. Each word fills in as you say it, and the line moves with you. You don't have to keep up. Breathe when you like, and the words wait.",
+    "Every line break in your script is a cut. At the end of a cut the words stop and wait, and a strip shows the things you can say. Read to the end of this one and watch it hold.",
+    "Pauses are where you talk to it, in plain words, without touching the screen. Fluffed a line? At the pause, say take that again and this cut starts over from its first word. Try it now. The second time you get here, say move on instead and it carries on.",
+    "Two more things, and then you know the whole tool. One: a take you are happy with. At the pause after any cut, say that's the one and that take is marked as the keeper. Two: in the middle of a cut, put my name first. Say prompter, then the command, so your own lines are not taken as orders.",
+    "And there you have it, the whole tool, and you can stop reading here if you like. Three more phrases, for when you need them: back up goes back one cut, from the top starts the whole script over, and that's a wrap ends the session without keeping anything. When the words stop after this cut, say that's the one and it keeps this take, ends the session, and shows you the log of every take you made."
   ].join("\n");
 
   var $ = function(id){ return document.getElementById(id); };
@@ -2037,12 +2055,12 @@
     var standalone = (window.navigator.standalone === true) || (window.matchMedia && window.matchMedia("(display-mode: standalone)").matches);
     return { kind:kind, phone:phone, engine:engine, w:w, h:h, tp:tp, standalone:standalone,
              origin: location.protocol + "//" + (location.host || "(local file)"),
-             build: "2026-09-18 07:06 UTC · 01cc2f4",
+             build: "2026-09-19 22:11 UTC · f624712",
              label: kind + ", in " + engine + (standalone ? ", added to the home screen" : "")
                     + " · screen " + w + "×" + h
                     + " · loaded from " + location.protocol + "//" + (location.host || "(local file)") };
   }
-  var BUILD = "2026-09-18 07:06 UTC · 01cc2f4";
+  var BUILD = "2026-09-19 22:11 UTC · f624712";
   var DEV = device();
   $("deviceLine").textContent = DEV.label + "  ·  build " + BUILD;
   var canRun = preflight();
@@ -2276,6 +2294,12 @@
     readingLine: function(){ return readingLine($("stage")); },
     pauseBar: function(){ var pb = $("pause"); return { on: pb.dataset.on === "1", scale: pb.style.transform }; },
     cutSizes: function(){ return cuts.map(function(c){ return c.words.length; }); },
+    // The script's own words, so a check can read them instead of typing them
+    // (found 2026-09-19: eleven pins had the old sample's words typed in).
+    words: function(){ return flat.map(function(w){ return w.raw; }); },
+    scriptText: function(){ return DEFAULT; },
+    commands: function(){ return COMMANDS.map(function(c){ return { id: c.id, say: c.say.slice() }; }); },
+    phraseSlots: function(phrase){ return phraseSlotsOf(phraseWords(phrase)); },
     load: function(text){ build(text || DEFAULT); },
     stop: function(){ stopSession("driven"); },
     reset: function(){ cancelCountdown(); stopFallback(); setLost(false); endFails = []; paceMarks = []; lastCommandAt = -1e9;
@@ -2414,15 +2438,19 @@
   // The phrases (F-13, ruled V-2): two per command, editable, refused when
   // they appear in the script. COMMANDS is the one owner; the inputs write it.
   var DEFAULT_PHRASES = COMMANDS.map(function(c){ return c.say.slice(); });
-  function phraseInScript(words){
-    if (!words.length) return false;
+  // Every slot where a phrase occurs in the script — the settings' refusal
+  // and the how-to script's own checks both ask this, so it is decided once.
+  function phraseSlotsOf(words){
+    var out = [];
+    if (!words.length) return out;
     for (var s = 0; s + words.length <= flat.length; s++){
       var hit = 0;
       for (var k = 0; k < words.length; k++) if (flat[s + k].norm === words[k]) hit++;
-      if (hit === words.length) return true;
+      if (hit === words.length) out.push(s);
     }
-    return false;
+    return out;
   }
+  function phraseInScript(words){ return phraseSlotsOf(words).length > 0; }
   function renderPhrases(){
     var host = $("phrases"); if (!host) return;
     host.innerHTML = "";
