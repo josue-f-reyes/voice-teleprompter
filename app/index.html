@@ -10,6 +10,7 @@
   body{margin:0}
   img{max-width:100%}
   [hidden]{display:none!important}
+  @font-face{font-family:"Zen Dots";font-style:normal;font-weight:400;font-display:swap;src:url("/assets/zen-dots-latin-400-normal.woff2") format("woff2")}
   details.maker{display:none!important}
 </style>
 <meta name="description" content="Paste a script and read it from your phone. The words follow your voice, wait at the end of every cut, and go back when you say “take that again”.">
@@ -104,6 +105,12 @@
   .stage[data-mode="sweep"] .cut{margin:0}
   .stage[data-mode="sweep"] .cutmark{display:none}
   .stage[data-mode="sweep"] #cutchip{display:block}
+  #lamp{display:none;position:absolute;top:10px;left:12px;z-index:4;width:24px;height:20px} #lamp svg{width:100%;height:100%;display:block}
+  #app[data-screen="read"] #lamp{display:block}
+  #lamp path{fill:var(--t5);transition:fill .25s}
+  .stage[data-hear="1"] #lamp path{animation:lampstep 1s steps(1,end) infinite}
+  @keyframes lampstep{0%,49%{fill:var(--lime)}50%,100%{fill:#8faa2a}}
+  @media (prefers-reduced-motion: reduce){.stage[data-hear="1"] #lamp path{animation:none;fill:var(--lime)}}
   #cmdflash{position:absolute;left:50%;transform:translateX(-50%);bottom:14px;z-index:4;opacity:0;
     transition:opacity .2s ease;font-family:var(--mono);font-size:.68rem;letter-spacing:.12em;
     text-transform:uppercase;color:var(--lime);border:1px solid var(--lime);border-radius:99px;padding:5px 12px;
@@ -245,6 +252,9 @@
 
   textarea{width:100%;background:var(--well);color:var(--paper);border:1px solid var(--line-quiet);border-radius:7px;padding:14px 15px;font-family:var(--sans);font-size:1rem;min-height:92px;resize:vertical;line-height:1.55}
   textarea:focus-visible{outline:2px solid var(--lime);outline-offset:2px;border-color:var(--line)}
+  .brandrow{display:flex;align-items:center;gap:10px;margin:0 0 14px;color:var(--paper)}
+  .brandrow .lockup{height:22px;width:auto;display:block;flex:0 0 auto} .brandrow .sep{width:1px;height:14px;background:var(--line)}
+  .brandrow .tool{font-family:var(--mono);font-size:.62rem;letter-spacing:.12em;text-transform:uppercase;color:var(--t3)}
   .screen[data-for="paste"] header{margin-bottom:8px} .screen[data-for="paste"] #src{min-height:38vh;margin-top:18px}
   .screen[data-for="paste"] .stand{font-size:1.02rem}
   label.fld{display:block;font-family:var(--mono);font-size:.62rem;text-transform:uppercase;letter-spacing:.13em;color:var(--t4);margin-bottom:6px}
@@ -266,10 +276,15 @@
   #app[data-pane="1"] .screen[data-for="check"] .checklist,#app[data-pane="1"] .screen[data-for="check"] #startHint,#app[data-pane="1"] #go{display:none}
   .bar{display:flex;justify-content:space-between;align-items:center;gap:10px} .bar button{padding:8px 12px;display:inline-flex;align-items:center;gap:6px}
   .bar .chev-l{width:14px;height:14px;flex:0 0 auto}
-  /* The screens' rhythm: the bar sits close to the stage; the list and the primary get room. */
+  /* The screens' rhythm: the bar sits close to the stage; the list and the primary get room.
+     The lower check section is "a check section after a check section": :last-of-type counted
+     every <section> and landed on the end screen, so these rules were dead until 2026-09-21. */
   #app[data-screen="check"]{gap:12px} #app[data-screen="check"] #counts{margin-top:8px}
-  #app[data-screen="check"] .screen[data-for="check"]:last-of-type{display:flex;flex-direction:column;gap:12px}
-  #app[data-screen="check"] .screen[data-for="check"]:last-of-type .controls{margin-top:12px}
+  #app[data-screen="check"] .screen[data-for="check"] ~ .screen[data-for="check"]{display:flex;flex-direction:column;gap:12px}
+  #app[data-screen="check"] .screen[data-for="check"] ~ .screen[data-for="check"] .controls.pinned{position:sticky;bottom:0;z-index:5;margin:4px -4px 0;padding:12px 4px 14px;
+    background:linear-gradient(rgba(18,17,16,0),var(--ink) 40%)}
+  #app[data-screen="check"] #go{background:var(--lime);border-color:var(--lime);color:#14160a;font-weight:700;width:100%;padding:14px 18px;font-size:.78rem}
+  #app[data-screen="check"] #go:hover:not(:disabled){background:#d4ff5a;border-color:#d4ff5a;color:#14160a}
   #app[data-screen="end"] .screen[data-for="end"] header{margin-bottom:10px}
   .counts{font-family:var(--mono);font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--t3)}
   .checklist{display:flex;flex-direction:column;gap:6px}
@@ -286,7 +301,8 @@
      box, on the first screen, before anything has been pressed — and it is
      DERIVED from what the browser granted, never typed, so it cannot claim
      the device while the audio goes to a server (Bug Class #4). */
-  .privacy{margin:16px 0 0;padding-left:12px;border-left:3px solid var(--line);color:var(--t3);font-size:.88rem;line-height:1.6;max-width:62ch}
+  .privacy{margin:14px 0 0;color:var(--t3);font-family:var(--mono);font-size:.68rem;letter-spacing:.02em;line-height:1.6;max-width:62ch} .privacy b{color:var(--t2);font-weight:400}
+  .privacy details.dd{margin-top:8px;font-family:var(--sans)} .privacy details.dd>summary{font-size:.8rem;min-height:36px;padding:7px 12px} .privacy .dd-body p{margin:8px 0;font-size:.84rem;line-height:1.6;color:var(--t2)} .privacy .dd-body b{color:var(--paper)}
   .privacy b{color:var(--t2);font-weight:600}
   .privacy button{margin-top:9px}
   #pane{position:fixed;left:0;right:0;bottom:0;max-height:50vh;overflow-y:auto;overflow-x:hidden;background:var(--panel);border-top:1px solid var(--line);
@@ -348,6 +364,10 @@
   <!-- ==================================================== the paste (F-2) -->
   <section class="screen" data-for="paste">
     <header>
+      <!-- Q-3 (ruled 2026-09-21): the lockup, small, with the tool's name beside
+           it — once, on the screen every session starts from. The mark is
+           injected by bench_build from BrandMark.tsx, its one owner. -->
+      <p class="brandrow"><svg class="lockup" viewBox="0 0 1820.2 280" role="img" aria-label="Rivet Lab"><g transform="scale(0.35378) translate(-115.23 -27.32)"><path d="M 1017.31 635.11 C 1059.32 607.30 1058.00 566.06 1013.78 541.77 C 1008.11 540.96 1002.50 539.14 996.78 539.34 C 940.39 541.37 959.18 590.28 943.04 614.93 C 925.20 642.17 868.68 664.37 837.80 668.17 C 800.42 661.36 797.92 637.90 806.22 603.55 C 819.27 549.55 846.24 494.37 878.83 449.54 C 904.10 431.88 920.30 440.95 941.78 426.35 C 957.48 415.68 963.15 400.59 968.59 383.42 C 970.81 336.16 945.11 307.90 897.08 309.69 C 869.13 319.96 845.56 336.03 842.83 368.65 C 840.77 393.09 857.55 410.85 846.56 435.10 C 827.49 477.16 772.35 537.08 733.64 561.75 C 666.33 586.65 662.02 506.53 660.79 460.45 C 659.14 398.39 665.27 334.33 675.15 273.10 C 678.71 251.08 679.14 226.64 688.76 206.11 C 701.36 179.26 728.04 176.25 745.80 145.15 C 758.05 97.58 744.90 68.43 699.66 48.43 C 655.60 41.03 622.28 63.15 608.96 105.33 C 607.77 123.09 607.44 139.18 618.19 154.61 C 629.21 170.43 642.29 175.69 646.10 196.24 C 652.21 229.12 642.86 265.94 637.50 298.32 C 625.97 368.06 608.30 487.63 556.62 537.80 C 524.11 553.29 506.04 541.76 479.04 521.09 C 432.70 485.60 394.21 417.78 395.46 358.64 C 396.20 324.02 412.96 292.77 409.58 257.53 C 406.84 228.97 394.32 201.83 374.80 180.86 C 281.60 80.76 117.36 171.96 134.81 287.95 C 142.50 339.03 170.92 387.17 220.90 407.10 C 254.41 420.46 284.38 418.14 317.55 439.40 C 398.43 491.22 428.32 585.02 430.01 676.26 C 430.13 682.26 436.32 682.79 441.24 685.21 C 456.11 692.53 470.99 699.85 485.86 707.17 C 549.08 738.28 612.30 769.40 675.52 800.51 C 751.75 762.99 827.98 725.47 904.21 687.96 C 929.78 675.37 947.48 648.36 966.83 640.79 C 982.02 634.85 1001.26 638.37 1017.31 635.11 Z" fill="var(--lime)"/></g><text x="486.2" y="201.8" font-size="139.86" letter-spacing="39.16" font-family="Zen Dots, sans-serif" fill="currentColor">RIVET LAB</text></svg><span class="sep"></span><span class="tool">Voice Teleprompter</span></p>
       <h1>Paste your script</h1>
       <p class="stand">Put this phone behind your camera and read from it. The words move as you say them, wait at the
         end of each cut, and go back when you say <b>“take that again”</b>. <b>Press Enter to start a new cut</b> — a cut is
@@ -374,6 +394,10 @@
      color:var(--warn);font-size:.86rem;line-height:1.5"></p>
 
   <section id="stage" class="stage" aria-live="off">
+    <!-- Q-4 (ruled 2026-09-21): the mark is the listening lamp — dim while the
+         tool waits, stepping lime while words are arriving. It answers "is it
+         still hearing me?" in the lab's own convention (machines step). -->
+    <span id="lamp" aria-hidden="true"><svg class="mark" viewBox="115.23 27.32 950.37 791.46" aria-hidden="true"><path d="M 1017.31 635.11 C 1059.32 607.30 1058.00 566.06 1013.78 541.77 C 1008.11 540.96 1002.50 539.14 996.78 539.34 C 940.39 541.37 959.18 590.28 943.04 614.93 C 925.20 642.17 868.68 664.37 837.80 668.17 C 800.42 661.36 797.92 637.90 806.22 603.55 C 819.27 549.55 846.24 494.37 878.83 449.54 C 904.10 431.88 920.30 440.95 941.78 426.35 C 957.48 415.68 963.15 400.59 968.59 383.42 C 970.81 336.16 945.11 307.90 897.08 309.69 C 869.13 319.96 845.56 336.03 842.83 368.65 C 840.77 393.09 857.55 410.85 846.56 435.10 C 827.49 477.16 772.35 537.08 733.64 561.75 C 666.33 586.65 662.02 506.53 660.79 460.45 C 659.14 398.39 665.27 334.33 675.15 273.10 C 678.71 251.08 679.14 226.64 688.76 206.11 C 701.36 179.26 728.04 176.25 745.80 145.15 C 758.05 97.58 744.90 68.43 699.66 48.43 C 655.60 41.03 622.28 63.15 608.96 105.33 C 607.77 123.09 607.44 139.18 618.19 154.61 C 629.21 170.43 642.29 175.69 646.10 196.24 C 652.21 229.12 642.86 265.94 637.50 298.32 C 625.97 368.06 608.30 487.63 556.62 537.80 C 524.11 553.29 506.04 541.76 479.04 521.09 C 432.70 485.60 394.21 417.78 395.46 358.64 C 396.20 324.02 412.96 292.77 409.58 257.53 C 406.84 228.97 394.32 201.83 374.80 180.86 C 281.60 80.76 117.36 171.96 134.81 287.95 C 142.50 339.03 170.92 387.17 220.90 407.10 C 254.41 420.46 284.38 418.14 317.55 439.40 C 398.43 491.22 428.32 585.02 430.01 676.26 C 430.13 682.26 436.32 682.79 441.24 685.21 C 456.11 692.53 470.99 699.85 485.86 707.17 C 549.08 738.28 612.30 769.40 675.52 800.51 C 751.75 762.99 827.98 725.47 904.21 687.96 C 929.78 675.37 947.48 648.36 966.83 640.79 C 982.02 634.85 1001.26 638.37 1017.31 635.11 Z" fill="var(--lime)"/></svg></span>
     <span id="cutchip"></span>
     <span id="cmdflash"></span>
     <span id="foot"></span>
@@ -393,11 +417,14 @@
     <p id="counts" class="counts" style="margin:0 0 8px"></p>
     <div id="checklist" class="checklist"></div>
     <p id="awake" class="warnline" style="display:none"></p>
-    <p class="controls"><button id="go" class="go">Start reading</button></p>
     <p class="hint" id="startHint">Press Start, then walk to where you’ll stand; the words appear after a five-second count.
       At the end of each cut it waits for you: say <b>“take that again”</b> to redo it, <b>“that’s the one”</b> to mark it as the
       keeper, or <b>“move on”</b> to continue. Mid-cut, say <b>“prompter”</b> first: “prompter, take that again”.</p>
     <p id="micline" class="warnline" style="display:none"></p>
+    <!-- Q-1 (ruled 2026-09-21): the start rides the bottom edge whatever the
+         script's length; the preview and the rows scroll under it. Lime,
+         because it is the one control on this screen that starts something. -->
+    <p class="controls pinned"><button id="go" class="go">Start reading</button></p>
   </section>
 
   <!-- ==================================================== the end (F-11) -->
@@ -1079,6 +1106,14 @@
     log("TAKE cut " + (cut+1) + " take " + openTake.n + " begins");
     return openTake;
   }
+  // The lamp: lit for a beat after every result the recogniser hands over,
+  // interim or final, so a pause reads as dim and a dead microphone stays dim.
+  var hearUntil = 0;
+  function hearing(){
+    $("stage").dataset.hear = "1";
+    hearUntil = performance.now() + 1200;
+    setTimeout(function(){ if (performance.now() >= hearUntil) $("stage").dataset.hear = "0"; }, 1250);
+  }
   function heardWord(j){
     var tk = openTakeFor(flat[j].cut);
     if (!tk.seen[j]){ tk.seen[j] = 1; tk.heard = Object.keys(tk.seen).length; }
@@ -1716,32 +1751,43 @@
   function renderPrivacy(){
     var el = $("privacy"); if (!el) return;
     var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-    var head = "<b>Your script never leaves this browser.</b> It is not sent to us, and it is still here when you " +
-               "come back. ";
-    var tail, offer = false;
+    // Q-2 (ruled 2026-09-21): ONE line under the paste box, true in every
+    // clause, and the full explanation behind a door. The old head claimed
+    // the script was "still here when you come back" — the page saves the
+    // settings and never the script, so that clause is gone.
+    var head = "<b>Your script stays on this phone</b> and is never sent to us. ";
+    var line, tail, offer = false;
     if (!SR || cannotListen){
+      line = "This browser cannot listen, so your microphone is never opened.";
       tail = "This browser has no speech recognition, so nothing listens at all: the words move at a set pace and " +
              "your microphone is never opened.";
     } else if (ONDEVICE === "available"){
+      line = "Your voice becomes words on this device and never leaves it.";
       tail = "Your voice is recognised <b>on this device</b> \u2014 the sound never leaves it, and we never receive it.";
     } else if (ONDEVICE === "downloading"){
+      line = "Your voice goes to " + whoHears() + " to become words, never to us \u2014 a language pack is downloading so it can stay on this device.";
       tail = "The sound of your voice is going to " + whoHears() + " to be turned into words; we never receive it. " +
              "A language pack is downloading now, and once it lands your voice stays on this device.";
     } else if (ONDEVICE === "downloadable"){
+      line = "Your voice goes to " + whoHears() + " to become words, never to us. This browser can keep it on the device instead.";
       tail = "The sound of your voice is sent to " + whoHears() + " to be turned into words; we never receive it and " +
              "never record it. <b>This browser can do that on the device instead</b>, once it has downloaded the words " +
              "it needs.";
       offer = true;
     } else {
+      line = "Your voice goes to " + whoHears() + " to become words, never to us.";
       tail = "To follow along, the page uses your browser\u2019s own speech recognition: the sound of your voice is " +
              "sent to " + whoHears() + " to be turned into words. We never receive it and never record it.";
     }
-    el.innerHTML = head + tail;
+    var wasOpen = !!(el.querySelector("details") && el.querySelector("details").open);
+    el.innerHTML = head + line +
+      '<details class="dd why"' + (wasOpen ? " open" : "") + '><summary><svg class="chev" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 6l5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Where exactly does my voice go?</summary>' +
+      '<div class="dd-body"><p>' + tail + '</p></div></details>';
     if (offer){
       var b = document.createElement("button");
       b.type = "button"; b.id = "keeplocal"; b.textContent = "Keep my voice on this device";
       b.addEventListener("click", function(){ installOnDevice(b); });
-      el.appendChild(document.createElement("br")); el.appendChild(b);
+      el.querySelector(".dd-body").appendChild(b);
     }
   }
 
@@ -1853,6 +1899,7 @@
     rec.onspeechend = function(){ speaking = false; log("speech ended"); };
 
     rec.onresult = function(ev){
+      hearing();
       var now = performance.now();
       if (m.firstResultLag == null) m.firstResultLag = Math.round(now - startedAt);
       if (m.lastResultAt){
@@ -2055,12 +2102,12 @@
     var standalone = (window.navigator.standalone === true) || (window.matchMedia && window.matchMedia("(display-mode: standalone)").matches);
     return { kind:kind, phone:phone, engine:engine, w:w, h:h, tp:tp, standalone:standalone,
              origin: location.protocol + "//" + (location.host || "(local file)"),
-             build: "2026-09-19 22:12 UTC · f624712",
+             build: "2026-09-21 05:37 UTC · 89658b4",
              label: kind + ", in " + engine + (standalone ? ", added to the home screen" : "")
                     + " · screen " + w + "×" + h
                     + " · loaded from " + location.protocol + "//" + (location.host || "(local file)") };
   }
-  var BUILD = "2026-09-19 22:12 UTC · f624712";
+  var BUILD = "2026-09-21 05:37 UTC · 89658b4";
   var DEV = device();
   $("deviceLine").textContent = DEV.label + "  ·  build " + BUILD;
   var canRun = preflight();
@@ -2526,7 +2573,8 @@
     phrases: function(){ return COMMANDS.map(function(c){ return c.say.slice(); }); },
     setPhrase: function(id, n, v){ var i = $("ph-" + id + "-" + n); i.value = v; i.dispatchEvent(new Event("input", { bubbles: true })); return { bad: i.dataset.bad === "1", why: i.closest(".phrase").querySelector(".why").textContent }; },
     gates: function(){ return { name: GATE_NAME_MIDTAKE, offscript: GATE_OFFSCRIPT, ahead: GATE_NOT_AHEAD }; },
-    door: function(){ return $("door").textContent; }
+    door: function(){ return $("door").textContent; },
+    hearing: function(){ return $("stage").dataset.hear === "1"; }, hear: hearing
   };
 
 })();
