@@ -1129,9 +1129,9 @@
   // interim or final, so a pause reads as dim and a dead microphone stays dim.
   var hearUntil = 0;
   function hearing(){
-    app.dataset.hear = "1";
+    $("app").dataset.hear = "1";
     hearUntil = performance.now() + 1200;
-    setTimeout(function(){ if (performance.now() >= hearUntil) app.dataset.hear = "0"; }, 1250);
+    setTimeout(function(){ if (performance.now() >= hearUntil) $("app").dataset.hear = "0"; }, 1250);
   }
   function heardWord(j){
     var tk = openTakeFor(flat[j].cut);
@@ -2061,7 +2061,7 @@
     [["mirror-off", ""], ["mirror-x", "x"], ["mirror-y", "y"]].forEach(function(pair){ var b = $(pair[0]); if (b) b.setAttribute("aria-pressed", MIRROR === pair[1] ? "true" : "false"); });
   }
   function setTimed(on){
-    TIMED = !!on; app.dataset.timed = TIMED ? "1" : "";
+    TIMED = !!on; $("app").dataset.timed = TIMED ? "1" : "";   // by id: loadSettings runs before `app` is assigned (found 2026-09-21)
     $("follow-voice").setAttribute("aria-pressed", TIMED ? "false" : "true");
     $("follow-timed").setAttribute("aria-pressed", TIMED ? "true" : "false");
     $("wpsRow").hidden = !TIMED;
@@ -2135,12 +2135,12 @@
     var standalone = (window.navigator.standalone === true) || (window.matchMedia && window.matchMedia("(display-mode: standalone)").matches);
     return { kind:kind, phone:phone, engine:engine, w:w, h:h, tp:tp, standalone:standalone,
              origin: location.protocol + "//" + (location.host || "(local file)"),
-             build: "2026-09-21 06:00 UTC · 7310560",
+             build: "2026-09-21 06:02 UTC · fc1995a",
              label: kind + ", in " + engine + (standalone ? ", added to the home screen" : "")
                     + " · screen " + w + "×" + h
                     + " · loaded from " + location.protocol + "//" + (location.host || "(local file)") };
   }
-  var BUILD = "2026-09-21 06:00 UTC · 7310560";
+  var BUILD = "2026-09-21 06:02 UTC · fc1995a";
   var DEV = device();
   $("deviceLine").textContent = DEV.label + "  ·  build " + BUILD;
   var canRun = preflight();
@@ -2611,7 +2611,7 @@
     setPhrase: function(id, n, v){ var i = $("ph-" + id + "-" + n); i.value = v; i.dispatchEvent(new Event("input", { bubbles: true })); return { bad: i.dataset.bad === "1", why: i.closest(".phrase").querySelector(".why").textContent }; },
     gates: function(){ return { name: GATE_NAME_MIDTAKE, offscript: GATE_OFFSCRIPT, ahead: GATE_NOT_AHEAD }; },
     door: function(){ return $("door").textContent; },
-    hearing: function(){ return app.dataset.hear === "1"; }, hear: hearing,
+    hearing: function(){ return $("app").dataset.hear === "1"; }, hear: hearing,
     paneOpen: function(){ return !$("pane").hidden; }, fallbackOn: function(){ return !!fallback; },
     pace: function(v){ if (typeof v === "number") setPace(v); return SCROLL_WPS; }
   };
