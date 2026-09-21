@@ -105,12 +105,21 @@
   .stage[data-mode="sweep"] .cut{margin:0}
   .stage[data-mode="sweep"] .cutmark{display:none}
   .stage[data-mode="sweep"] #cutchip{display:block}
-  #lamp{display:none;position:absolute;top:10px;left:12px;z-index:4;width:24px;height:20px} #lamp svg{width:100%;height:100%;display:block}
-  #app[data-screen="read"] #lamp{display:block}
+  #lamp{display:none;width:26px;height:22px;flex:0 0 auto;margin-right:auto} #lamp svg{width:100%;height:100%;display:block}
+  #app[data-screen="read"]:not([data-fallback="1"]):not([data-timed="1"]) #lamp{display:block}
+  /* The cut chip is a reading-face mark; on the check screen it sat over the
+     "lens is up here" line once the pane shrank the stage (2026-09-21). */
+  #app[data-screen="check"] #cutchip{display:none}
   #lamp path{fill:var(--t5);transition:fill .25s}
-  .stage[data-hear="1"] #lamp path{animation:lampstep 1s steps(1,end) infinite}
+  #app[data-hear="1"] #lamp path{animation:lampstep 1s steps(1,end) infinite}
   @keyframes lampstep{0%,49%{fill:var(--lime)}50%,100%{fill:#8faa2a}}
-  @media (prefers-reduced-motion: reduce){.stage[data-hear="1"] #lamp path{animation:none;fill:var(--lime)}}
+  @media (prefers-reduced-motion: reduce){#app[data-hear="1"] #lamp path{animation:none;fill:var(--lime)}}
+  /* At a set pace the voice is gone, so touch is allowed (the same reasoning as
+     tap-to-pause): the speed can be changed from the bar, mid-read. */
+  #pace{display:none;align-items:center;gap:8px;margin-right:auto} #pace[hidden]{display:none}
+  #app[data-fallback="1"] #pace:not([hidden]){display:inline-flex}
+  #pace b{font-family:var(--mono);font-size:.62rem;letter-spacing:.06em;color:var(--t3);font-weight:400;white-space:nowrap}
+  #pace button{padding:8px 10px;font-size:.6rem}
   #cmdflash{position:absolute;left:50%;transform:translateX(-50%);bottom:14px;z-index:4;opacity:0;
     transition:opacity .2s ease;font-family:var(--mono);font-size:.68rem;letter-spacing:.12em;
     text-transform:uppercase;color:var(--lime);border:1px solid var(--lime);border-radius:99px;padding:5px 12px;
@@ -312,7 +321,12 @@
      tight (8), a section head gets more above it than below (24 / 8), the
      door that explains a section is its quiet last row. */
   #pane{--p-title:20px;--p-body:12.5px;--p-small:10.5px;--s1:4px;--s2:8px;--s3:12px;--s4:24px}
-  #pane .bar{margin-bottom:var(--s1)} #pane .bar b{font-size:var(--p-title);font-weight:600;letter-spacing:-.015em}
+  /* Done stays at the top of the pane while it scrolls (founder, 2026-09-21:
+     "the Done button isn't sticky, so when the user scrolls, they can miss it"). */
+  #pane .bar{position:sticky;top:-14px;z-index:2;background:var(--panel);margin:-14px 0 var(--s1);padding:14px 0 8px} #pane .bar b{font-size:var(--p-title);font-weight:600;letter-spacing:-.015em}
+  /* A tap anywhere outside the pane closes it. Transparent on purpose: the
+     stage above stays readable while the sliders move it (S-1). */
+  #scrim{position:fixed;inset:0;z-index:29;background:transparent} #scrim[hidden]{display:none}
   #pane .bar button{padding:8px 14px}
   #pane>.hint{margin:0 0 var(--s1)}
   #pane button{font-size:var(--p-body);padding:8px 14px} #pane .hint{font-size:var(--p-small);color:var(--t4);letter-spacing:.02em}
@@ -387,7 +401,12 @@
 
   <!-- ==================================================== the read -->
   <section class="screen" data-for="read">
-    <div class="bar" style="justify-content:flex-end"><button id="stopbtn">Stop</button></div>
+    <!-- The lamp (Q-4) lives in the bar, not on the stage: on the stage it sat
+         over the between-cuts strip (founder, 2026-09-21). It shows only while
+         something listens — at a set pace the bar carries the speed instead. -->
+    <div class="bar"><span id="lamp" aria-hidden="true"><svg class="mark" viewBox="115.23 27.32 950.37 791.46" aria-hidden="true"><path d="M 1017.31 635.11 C 1059.32 607.30 1058.00 566.06 1013.78 541.77 C 1008.11 540.96 1002.50 539.14 996.78 539.34 C 940.39 541.37 959.18 590.28 943.04 614.93 C 925.20 642.17 868.68 664.37 837.80 668.17 C 800.42 661.36 797.92 637.90 806.22 603.55 C 819.27 549.55 846.24 494.37 878.83 449.54 C 904.10 431.88 920.30 440.95 941.78 426.35 C 957.48 415.68 963.15 400.59 968.59 383.42 C 970.81 336.16 945.11 307.90 897.08 309.69 C 869.13 319.96 845.56 336.03 842.83 368.65 C 840.77 393.09 857.55 410.85 846.56 435.10 C 827.49 477.16 772.35 537.08 733.64 561.75 C 666.33 586.65 662.02 506.53 660.79 460.45 C 659.14 398.39 665.27 334.33 675.15 273.10 C 678.71 251.08 679.14 226.64 688.76 206.11 C 701.36 179.26 728.04 176.25 745.80 145.15 C 758.05 97.58 744.90 68.43 699.66 48.43 C 655.60 41.03 622.28 63.15 608.96 105.33 C 607.77 123.09 607.44 139.18 618.19 154.61 C 629.21 170.43 642.29 175.69 646.10 196.24 C 652.21 229.12 642.86 265.94 637.50 298.32 C 625.97 368.06 608.30 487.63 556.62 537.80 C 524.11 553.29 506.04 541.76 479.04 521.09 C 432.70 485.60 394.21 417.78 395.46 358.64 C 396.20 324.02 412.96 292.77 409.58 257.53 C 406.84 228.97 394.32 201.83 374.80 180.86 C 281.60 80.76 117.36 171.96 134.81 287.95 C 142.50 339.03 170.92 387.17 220.90 407.10 C 254.41 420.46 284.38 418.14 317.55 439.40 C 398.43 491.22 428.32 585.02 430.01 676.26 C 430.13 682.26 436.32 682.79 441.24 685.21 C 456.11 692.53 470.99 699.85 485.86 707.17 C 549.08 738.28 612.30 769.40 675.52 800.51 C 751.75 762.99 827.98 725.47 904.21 687.96 C 929.78 675.37 947.48 648.36 966.83 640.79 C 982.02 634.85 1001.26 638.37 1017.31 635.11 Z" fill="var(--lime)"/></svg></span>
+      <span id="pace" class="pace" hidden><button id="slower" type="button">Slower</button><b id="paceOut">2.0 words a second</b><button id="faster" type="button">Faster</button></span>
+      <button id="stopbtn">Stop</button></div>
   </section>
 
   <p id="fit" style="display:none;margin:0;padding:11px 14px;border:1px solid var(--warn);border-radius:8px;
@@ -397,7 +416,6 @@
     <!-- Q-4 (ruled 2026-09-21): the mark is the listening lamp — dim while the
          tool waits, stepping lime while words are arriving. It answers "is it
          still hearing me?" in the lab's own convention (machines step). -->
-    <span id="lamp" aria-hidden="true"><svg class="mark" viewBox="115.23 27.32 950.37 791.46" aria-hidden="true"><path d="M 1017.31 635.11 C 1059.32 607.30 1058.00 566.06 1013.78 541.77 C 1008.11 540.96 1002.50 539.14 996.78 539.34 C 940.39 541.37 959.18 590.28 943.04 614.93 C 925.20 642.17 868.68 664.37 837.80 668.17 C 800.42 661.36 797.92 637.90 806.22 603.55 C 819.27 549.55 846.24 494.37 878.83 449.54 C 904.10 431.88 920.30 440.95 941.78 426.35 C 957.48 415.68 963.15 400.59 968.59 383.42 C 970.81 336.16 945.11 307.90 897.08 309.69 C 869.13 319.96 845.56 336.03 842.83 368.65 C 840.77 393.09 857.55 410.85 846.56 435.10 C 827.49 477.16 772.35 537.08 733.64 561.75 C 666.33 586.65 662.02 506.53 660.79 460.45 C 659.14 398.39 665.27 334.33 675.15 273.10 C 678.71 251.08 679.14 226.64 688.76 206.11 C 701.36 179.26 728.04 176.25 745.80 145.15 C 758.05 97.58 744.90 68.43 699.66 48.43 C 655.60 41.03 622.28 63.15 608.96 105.33 C 607.77 123.09 607.44 139.18 618.19 154.61 C 629.21 170.43 642.29 175.69 646.10 196.24 C 652.21 229.12 642.86 265.94 637.50 298.32 C 625.97 368.06 608.30 487.63 556.62 537.80 C 524.11 553.29 506.04 541.76 479.04 521.09 C 432.70 485.60 394.21 417.78 395.46 358.64 C 396.20 324.02 412.96 292.77 409.58 257.53 C 406.84 228.97 394.32 201.83 374.80 180.86 C 281.60 80.76 117.36 171.96 134.81 287.95 C 142.50 339.03 170.92 387.17 220.90 407.10 C 254.41 420.46 284.38 418.14 317.55 439.40 C 398.43 491.22 428.32 585.02 430.01 676.26 C 430.13 682.26 436.32 682.79 441.24 685.21 C 456.11 692.53 470.99 699.85 485.86 707.17 C 549.08 738.28 612.30 769.40 675.52 800.51 C 751.75 762.99 827.98 725.47 904.21 687.96 C 929.78 675.37 947.48 648.36 966.83 640.79 C 982.02 634.85 1001.26 638.37 1017.31 635.11 Z" fill="var(--lime)"/></svg></span>
     <span id="cutchip"></span>
     <span id="cmdflash"></span>
     <span id="foot"></span>
@@ -451,6 +469,7 @@
   </section>
 
   <!-- ==================================================== the settings pane (F-13) -->
+  <div id="scrim" hidden></div>
   <div id="pane" hidden>
     <div class="bar"><b>Settings</b><button id="paneclose">Done</button></div>
     <p class="hint">Saved on this device, so they stay the same for every script.</p>
@@ -1110,9 +1129,9 @@
   // interim or final, so a pause reads as dim and a dead microphone stays dim.
   var hearUntil = 0;
   function hearing(){
-    $("stage").dataset.hear = "1";
+    app.dataset.hear = "1";
     hearUntil = performance.now() + 1200;
-    setTimeout(function(){ if (performance.now() >= hearUntil) $("stage").dataset.hear = "0"; }, 1250);
+    setTimeout(function(){ if (performance.now() >= hearUntil) app.dataset.hear = "0"; }, 1250);
   }
   function heardWord(j){
     var tk = openTakeFor(flat[j].cut);
@@ -1483,6 +1502,7 @@
     if (fallback) return;
     var p = wpsOverride ? { wps: wpsOverride, measured: false } : paceWps();
     fallback = { wps: p.wps, paused: false, timer: null, why: why };
+    app.dataset.fallback = "1"; $("pace").hidden = false; $("paceOut").textContent = p.wps.toFixed(1) + " words a second";
     // The foot names the reason: a chosen set speed is not a failure.
     foot(TIMED ? "set speed · " + p.wps.toFixed(1) + " words a second · tap to pause"
        : (cannotListen ? "this browser cannot listen — " : "it stopped hearing — ") + "moving at " + (p.measured ? "your" : "a set") + " pace · tap to pause");
@@ -1505,7 +1525,7 @@
   }
   function stopFallback(){
     if (!fallback) return;
-    clearTimeout(fallback.timer); fallback = null; foot("");
+    clearTimeout(fallback.timer); fallback = null; foot(""); app.dataset.fallback = ""; $("pace").hidden = true;
     paint();
   }
   function tapStage(){
@@ -2041,7 +2061,7 @@
     [["mirror-off", ""], ["mirror-x", "x"], ["mirror-y", "y"]].forEach(function(pair){ var b = $(pair[0]); if (b) b.setAttribute("aria-pressed", MIRROR === pair[1] ? "true" : "false"); });
   }
   function setTimed(on){
-    TIMED = !!on;
+    TIMED = !!on; app.dataset.timed = TIMED ? "1" : "";
     $("follow-voice").setAttribute("aria-pressed", TIMED ? "false" : "true");
     $("follow-timed").setAttribute("aria-pressed", TIMED ? "true" : "false");
     $("wpsRow").hidden = !TIMED;
@@ -2052,9 +2072,22 @@
   $("mirror-y").addEventListener("click", function(){ setMirror("y"); saveSettings(); });
   $("follow-voice").addEventListener("click", function(){ setTimed(false); saveSettings(); });
   $("follow-timed").addEventListener("click", function(){ setTimed(true); saveSettings(); });
+  // The speed has ONE owner. The slider in the settings, the Slower/Faster
+  // buttons on the read bar and a running fallback all read and write it here.
+  function setPace(w){
+    SCROLL_WPS = Math.round(Math.max(0.8, Math.min(4, w)) * 10) / 10;
+    var label = SCROLL_WPS.toFixed(1) + " words a second";
+    $("wps").value = SCROLL_WPS; $("wpsOut").textContent = label; $("paceOut").textContent = label;
+    if (fallback){
+      fallback.wps = SCROLL_WPS;
+      if (!fallback.paused) foot("moving at " + label + " · tap to pause");
+    }
+    saveSettings();
+  }
+  $("slower").addEventListener("click", function(){ setPace(SCROLL_WPS - 0.2); });
+  $("faster").addEventListener("click", function(){ setPace(SCROLL_WPS + 0.2); });
   $("wps").addEventListener("input", function(){
-    SCROLL_WPS = +this.value; $("wpsOut").textContent = SCROLL_WPS.toFixed(1) + " words a second";
-    if (fallback && TIMED){ fallback.wps = SCROLL_WPS; }
+    setPace(+this.value);
     saveSettings();
   });
   $("mode-sweep").addEventListener("click", function(){ setSweep(true); saveSettings(); });
@@ -2102,12 +2135,12 @@
     var standalone = (window.navigator.standalone === true) || (window.matchMedia && window.matchMedia("(display-mode: standalone)").matches);
     return { kind:kind, phone:phone, engine:engine, w:w, h:h, tp:tp, standalone:standalone,
              origin: location.protocol + "//" + (location.host || "(local file)"),
-             build: "2026-09-21 05:37 UTC · 89658b4",
+             build: "2026-09-21 06:00 UTC · 7310560",
              label: kind + ", in " + engine + (standalone ? ", added to the home screen" : "")
                     + " · screen " + w + "×" + h
                     + " · loaded from " + location.protocol + "//" + (location.host || "(local file)") };
   }
-  var BUILD = "2026-09-21 05:37 UTC · 89658b4";
+  var BUILD = "2026-09-21 06:00 UTC · 7310560";
   var DEV = device();
   $("deviceLine").textContent = DEV.label + "  ·  build " + BUILD;
   var canRun = preflight();
@@ -2470,8 +2503,12 @@
   $("again").addEventListener("click", function(){ build($("src").value || DEFAULT); show("check"); });
   $("newscript").addEventListener("click", function(){ show("paste"); });
   $("stopbtn").addEventListener("click", function(){ if (wantRunning) stopSession("ended when you stopped"); });
-  $("gear").addEventListener("click", function(){ $("pane").hidden = false; app.dataset.pane = "1"; relayout(); });
-  $("paneclose").addEventListener("click", function(){ $("pane").hidden = true; app.dataset.pane = ""; relayout(); renderCheck(); });
+  function openPane(){ $("pane").hidden = false; $("scrim").hidden = false; app.dataset.pane = "1"; relayout(); }
+  function closePane(){ if ($("pane").hidden) return; $("pane").hidden = true; $("scrim").hidden = true; app.dataset.pane = ""; relayout(); renderCheck(); }
+  $("gear").addEventListener("click", openPane);
+  $("paneclose").addEventListener("click", closePane);
+  $("scrim").addEventListener("click", closePane);
+  document.addEventListener("keydown", function(e){ if (e.key === "Escape") closePane(); });
   ["size", "width", "readline"].forEach(function(id){ $(id).addEventListener("input", function(){ if (screenNow() === "check") renderCheck(); }); });
 
   // The door (F-1): what the browser check found, on the paste screen, when
@@ -2559,7 +2596,7 @@
   probeOnDevice();
   // A deep link to the settings (#settings) opens the pane on load — for a
   // measured pass over it, and for a link that says "change your size here".
-  if (location.hash === "#settings"){ $("sample").click(); $("pane").hidden = false; app.dataset.pane = "1"; relayout(); }
+  if (location.hash === "#settings"){ $("sample").click(); openPane(); }
   if (location.hash === "#check"){ $("sample").click(); }
   window.__bench.flow = {
     show: show, screen: screenNow, checkRows: function(){ return [].map.call(document.querySelectorAll("#checklist .cutrow"), function(r){ return r.textContent; }); },
@@ -2574,7 +2611,9 @@
     setPhrase: function(id, n, v){ var i = $("ph-" + id + "-" + n); i.value = v; i.dispatchEvent(new Event("input", { bubbles: true })); return { bad: i.dataset.bad === "1", why: i.closest(".phrase").querySelector(".why").textContent }; },
     gates: function(){ return { name: GATE_NAME_MIDTAKE, offscript: GATE_OFFSCRIPT, ahead: GATE_NOT_AHEAD }; },
     door: function(){ return $("door").textContent; },
-    hearing: function(){ return $("stage").dataset.hear === "1"; }, hear: hearing
+    hearing: function(){ return app.dataset.hear === "1"; }, hear: hearing,
+    paneOpen: function(){ return !$("pane").hidden; }, fallbackOn: function(){ return !!fallback; },
+    pace: function(v){ if (typeof v === "number") setPace(v); return SCROLL_WPS; }
   };
 
 })();
