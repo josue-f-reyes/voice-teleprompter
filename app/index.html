@@ -264,6 +264,10 @@
   .brandrow{display:flex;align-items:center;gap:10px;margin:0 0 14px;color:var(--paper)}
   .brandrow .lockup{height:22px;width:auto;display:block;flex:0 0 auto} .brandrow .sep{width:1px;height:14px;background:var(--line)}
   .brandrow .tool{font-family:var(--mono);font-size:.62rem;letter-spacing:.12em;text-transform:uppercase;color:var(--t3)}
+  .brow{display:flex;gap:18px;align-items:center;flex-wrap:wrap;margin:10px 0 0}
+  .brow .b{display:inline-flex;align-items:center;gap:9px;font-family:var(--mono);font-size:.64rem;letter-spacing:.1em;text-transform:uppercase;color:var(--t4)}
+  .brow svg{width:22px;height:22px;flex:0 0 auto} .brow .disc,.brow .core,.brow .spokes,.brow .ticks,.brow .needle2{fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round} .brow .needle{fill:currentColor}
+  .brow .b[data-you="1"]{color:var(--paper)}
   .screen[data-for="paste"] header{margin-bottom:8px} .screen[data-for="paste"] #src{min-height:38vh;margin-top:18px}
   .screen[data-for="paste"] .stand{font-size:1.02rem}
   label.fld{display:block;font-family:var(--mono);font-size:.62rem;text-transform:uppercase;letter-spacing:.13em;color:var(--t4);margin-bottom:6px}
@@ -387,6 +391,14 @@
         end of each cut, and go back when you say <b>“take that again”</b>. <b>Press Enter to start a new cut</b> — a cut is
         one stretch of filming, from starting the camera to stopping it.</p>
     </header>
+    <!-- R-1/R-2 (ruled 2026-09-21): which browser can listen, said before it matters. Two
+         marks drawn as shapes — the compass, the ring — in grey outline; the phone being
+         held has its entry lit to paper (JS reads the platform). Read from the same rule
+         preflight() enforces: on an iPhone only Safari; elsewhere Chrome (or Edge). -->
+    <p class="brow" id="brow" aria-label="which browser can listen">
+      <span class="b" data-for="ios"><svg viewBox="0 0 24 24" aria-hidden="true"><circle class="disc" cx="12" cy="12" r="10.2"/><path class="needle" d="M18 6 13.4 12.6 11.4 10.6z"/><path class="needle2" d="M6 18 10.6 11.4 12.6 13.4z"/><path class="ticks" d="M12 2.6v2.2M12 19.2v2.2M2.6 12h2.2M19.2 12h2.2"/></svg>iPhone: Safari</span>
+      <span class="b" data-for="android"><svg viewBox="0 0 24 24" aria-hidden="true"><circle class="disc" cx="12" cy="12" r="10.2"/><circle class="core" cx="12" cy="12" r="3.9"/><path class="spokes" d="M15.9 12h6.4M10 8.6 6.8 3.1M9.9 15.4 6.7 20.9"/></svg>Android: Chrome</span>
+    </p>
     <div id="door"></div>
     <textarea id="src" spellcheck="false" placeholder="Paste your script here. Press Enter to start a new cut."></textarea>
     <p class="controls" style="margin-top:11px"><button id="load" class="go">See it as you’ll read it</button>
@@ -405,7 +417,7 @@
          over the between-cuts strip (founder, 2026-09-21). It shows only while
          something listens — at a set pace the bar carries the speed instead. -->
     <div class="bar"><span id="lamp" aria-hidden="true"><svg class="mark" viewBox="115.23 27.32 950.37 791.46" aria-hidden="true"><path d="M 1017.31 635.11 C 1059.32 607.30 1058.00 566.06 1013.78 541.77 C 1008.11 540.96 1002.50 539.14 996.78 539.34 C 940.39 541.37 959.18 590.28 943.04 614.93 C 925.20 642.17 868.68 664.37 837.80 668.17 C 800.42 661.36 797.92 637.90 806.22 603.55 C 819.27 549.55 846.24 494.37 878.83 449.54 C 904.10 431.88 920.30 440.95 941.78 426.35 C 957.48 415.68 963.15 400.59 968.59 383.42 C 970.81 336.16 945.11 307.90 897.08 309.69 C 869.13 319.96 845.56 336.03 842.83 368.65 C 840.77 393.09 857.55 410.85 846.56 435.10 C 827.49 477.16 772.35 537.08 733.64 561.75 C 666.33 586.65 662.02 506.53 660.79 460.45 C 659.14 398.39 665.27 334.33 675.15 273.10 C 678.71 251.08 679.14 226.64 688.76 206.11 C 701.36 179.26 728.04 176.25 745.80 145.15 C 758.05 97.58 744.90 68.43 699.66 48.43 C 655.60 41.03 622.28 63.15 608.96 105.33 C 607.77 123.09 607.44 139.18 618.19 154.61 C 629.21 170.43 642.29 175.69 646.10 196.24 C 652.21 229.12 642.86 265.94 637.50 298.32 C 625.97 368.06 608.30 487.63 556.62 537.80 C 524.11 553.29 506.04 541.76 479.04 521.09 C 432.70 485.60 394.21 417.78 395.46 358.64 C 396.20 324.02 412.96 292.77 409.58 257.53 C 406.84 228.97 394.32 201.83 374.80 180.86 C 281.60 80.76 117.36 171.96 134.81 287.95 C 142.50 339.03 170.92 387.17 220.90 407.10 C 254.41 420.46 284.38 418.14 317.55 439.40 C 398.43 491.22 428.32 585.02 430.01 676.26 C 430.13 682.26 436.32 682.79 441.24 685.21 C 456.11 692.53 470.99 699.85 485.86 707.17 C 549.08 738.28 612.30 769.40 675.52 800.51 C 751.75 762.99 827.98 725.47 904.21 687.96 C 929.78 675.37 947.48 648.36 966.83 640.79 C 982.02 634.85 1001.26 638.37 1017.31 635.11 Z" fill="var(--lime)"/></svg></span>
-      <span id="pace" class="pace" hidden><button id="slower" type="button">Slower</button><b id="paceOut">2.0 words a second</b><button id="faster" type="button">Faster</button></span>
+      <span id="pace" class="pace" hidden><button id="pausebtn" type="button">Pause</button><button id="slower" type="button">Slower</button><b id="paceOut">2.0 words a second</b><button id="faster" type="button">Faster</button></span>
       <button id="stopbtn">Stop</button></div>
   </section>
 
@@ -1504,8 +1516,9 @@
     fallback = { wps: p.wps, paused: false, timer: null, why: why };
     app.dataset.fallback = "1"; $("pace").hidden = false; $("paceOut").textContent = p.wps.toFixed(1) + " words a second";
     // The foot names the reason: a chosen set speed is not a failure.
-    foot(TIMED ? "set speed · " + p.wps.toFixed(1) + " words a second · tap to pause"
-       : (cannotListen ? "this browser cannot listen — " : "it stopped hearing — ") + "moving at " + (p.measured ? "your" : "a set") + " pace · tap to pause");
+    foot(TIMED ? "set speed · " + p.wps.toFixed(1) + " words a second"
+       : (cannotListen ? "this browser cannot listen — " : "it stopped hearing — ") + "moving at " + (p.measured ? "your" : "a set") + " pace");
+    $("pausebtn").textContent = "Pause";
     log("FALLBACK (" + why + ") — " + p.wps.toFixed(1) + " words/s" + (p.measured ? " measured" : " default"));
     if (rec && running) try { rec.stop(); } catch(e){}
     wantRunning = wantRunning || true;
@@ -1516,7 +1529,10 @@
         if (pos === at) pos = at + 1;   // never stick: the script's own word always counts
         paint();
       } else if (fallback && isHeld() && !fallback.paused){
-        fallback.paused = true; foot("end of the cut — tap to go on"); paint();
+        // Never hold at a set speed (founder, 2026-09-21): he is steps away and
+        // cannot come back to tap. The row is still written at the boundary;
+        // the reading rolls straight on into the next cut.
+        releasedBoundary = cutOf(pos); paint();
       }
       fallback.timer = setTimeout(tick, 1000 / fallback.wps);
     }
@@ -1528,11 +1544,43 @@
     clearTimeout(fallback.timer); fallback = null; foot(""); app.dataset.fallback = ""; $("pace").hidden = true;
     paint();
   }
-  function tapStage(){
+  // R-4 (ruled 2026-09-21): a tap on a line jumps the reading to that line's
+  // first word — in every mode. The open take closes as "jumped", so the log
+  // says what happened; the new cut is entered released, never held.
+  function jumpToWord(j){
+    if (!flat.length || j < 0 || j >= flat.length) return false;
+    var wasAt = pos;
+    if (j === pos) return false;
+    if (openTake) closeTake("jumped", flat[wasAt] ? flat[wasAt].raw : null);
+    pos = j; releasedBoundary = cutOf(pos); gapArmed = cutOf(pos); gapArmedHow = "ready";
+    lastBlock = -1; paint(); placeGuides();
+    flash("jumped to cut " + (cutOf(pos) + 1) + ", line " + ((lineOfWord[pos] || 0) + 1));
+    log("TAP jump → cut " + (cutOf(pos) + 1) + ", word " + pos + " (from " + wasAt + ")");
+    return true;
+  }
+  function wordAtPoint(x, y){
+    var w = null, hit = document.elementFromPoint ? document.elementFromPoint(x, y) : null;
+    if (hit && hit.closest) w = hit.closest("w");
+    if (w){ for (var i = 0; i < flat.length; i++) if (flat[i].el === w) return i; }
+    // Not on a word: the first word of whichever line the tap fell on.
+    for (var k = 0; k < flat.length; k++){
+      var r = flat[k].el.getBoundingClientRect();
+      if (y >= r.top && y <= r.bottom) return k;
+    }
+    return -1;
+  }
+  function tapStage(ev){
+    if (countingDown) return;
+    var j = ev && typeof ev.clientX === "number" ? wordAtPoint(ev.clientX, ev.clientY) : -1;
+    if (j >= 0){ jumpToWord(j); if (fallback && fallback.paused) togglePause(); return; }
+  }
+  // Pause and go on live on the bar now (the tap on the words is the jump).
+  function togglePause(){
     if (!fallback) return;
     if (fallback.paused && isHeld()) releasedBoundary = cutOf(pos);
     fallback.paused = !fallback.paused;
-    foot(fallback.paused ? "paused — tap to go on" : "moving at " + fallback.wps.toFixed(1) + " words a second · tap to pause");
+    $("pausebtn").textContent = fallback.paused ? "Go on" : "Pause";
+    foot(fallback.paused ? "paused" : "moving at " + fallback.wps.toFixed(1) + " words a second");
     log("fallback " + (fallback.paused ? "paused" : "resumed"));
   }
   // THE COUNTDOWN (F-4): five seconds, fixed, switchable. Words heard during
@@ -1739,6 +1787,8 @@
   // control rather than started behind the user's back mid-shoot.
   var ONDEVICE = "unknown";   // unknown · none · unavailable · downloadable · downloading · available
 
+  // "Google’s servers" reads; "your browser’s maker’s servers" does not.
+  function heardBy(){ var w = whoHears(); return /maker/.test(w) ? "your browser\u2019s own speech service" : w + "\u2019s servers"; }
   function whoHears(){
     var ua = navigator.userAgent;
     if (/Edg\//.test(ua)) return "Microsoft";
@@ -1779,30 +1829,30 @@
     var line, tail, offer = false;
     if (!SR || cannotListen){
       line = "This browser cannot listen, so your microphone is never opened.";
-      tail = "This browser has no speech recognition, so nothing listens at all: the words move at a set pace and " +
-             "your microphone is never opened.";
+      tail = "It has no speech recognition of its own, so nothing here can hear you. The words move at a set speed " +
+             "instead, and you can change that speed from the bar while they move.";
     } else if (ONDEVICE === "available"){
       line = "Your voice becomes words on this device and never leaves it.";
-      tail = "Your voice is recognised <b>on this device</b> \u2014 the sound never leaves it, and we never receive it.";
+      tail = "";   // the line is the whole story — a door would only repeat it (founder, 2026-09-21)
+      var _unused = "Your voice is recognised <b>on this device</b> \u2014 the sound never leaves it, and we never receive it.";
     } else if (ONDEVICE === "downloading"){
       line = "Your voice goes to " + whoHears() + " to become words, never to us \u2014 a language pack is downloading so it can stay on this device.";
-      tail = "The sound of your voice is going to " + whoHears() + " to be turned into words; we never receive it. " +
-             "A language pack is downloading now, and once it lands your voice stays on this device.";
+      tail = "Until the pack lands, " + heardBy() + " turn the sound into words and hand the words back; " +
+             "we never receive the sound and never record it.";
     } else if (ONDEVICE === "downloadable"){
       line = "Your voice goes to " + whoHears() + " to become words, never to us. This browser can keep it on the device instead.";
-      tail = "The sound of your voice is sent to " + whoHears() + " to be turned into words; we never receive it and " +
-             "never record it. <b>This browser can do that on the device instead</b>, once it has downloaded the words " +
-             "it needs.";
+      tail = heardBy() + " turn the sound into words and hand the words back; we never receive the sound and " +
+             "never record it. <b>This browser can do the same on the phone itself</b> once it has downloaded a language pack:";
       offer = true;
     } else {
       line = "Your voice goes to " + whoHears() + " to become words, never to us.";
-      tail = "To follow along, the page uses your browser\u2019s own speech recognition: the sound of your voice is " +
-             "sent to " + whoHears() + " to be turned into words. We never receive it and never record it.";
+      tail = "The page uses your browser\u2019s own speech recognition: " + heardBy() + " turn the sound into " +
+             "words and hand the words back. We never receive the sound and never record it.";
     }
     var wasOpen = !!(el.querySelector("details") && el.querySelector("details").open);
-    el.innerHTML = head + line +
+    el.innerHTML = head + line + (!tail ? "" :
       '<details class="dd why"' + (wasOpen ? " open" : "") + '><summary><svg class="chev" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 6l5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Where exactly does my voice go?</summary>' +
-      '<div class="dd-body"><p>' + tail + '</p></div></details>';
+      '<div class="dd-body"><p>' + tail + '</p></div></details>');
     if (offer){
       var b = document.createElement("button");
       b.type = "button"; b.id = "keeplocal"; b.textContent = "Keep my voice on this device";
@@ -1815,7 +1865,18 @@
   // Runs ON LOAD, not behind a button. Two runs were already burned on a
   // browser that could never have worked; the page has to say so before it
   // asks for anything.
+  // The held phone's entry in the browser row lights up. Same platform read
+  // preflight() makes; a desktop lights neither (both browsers listen there).
+  function lightBrowserRow(){
+    var ua = navigator.userAgent;
+    var iOS = /iPhone|iPad/.test(ua) || (/Macintosh/.test(ua) && (navigator.maxTouchPoints||0) > 1);
+    var android = /Android/.test(ua);
+    var row = $("brow"); if (!row) return;
+    row.querySelector('[data-for="ios"]').dataset.you = iOS ? "1" : "";
+    row.querySelector('[data-for="android"]').dataset.you = android ? "1" : "";
+  }
   function preflight(pre){
+    lightBrowserRow();
     var el = $("pre"); el.textContent = "";
     function pre_say(k,l,h){
       var d = document.createElement("div"); d.className = "v"; d.dataset.k = k;
@@ -2080,10 +2141,11 @@
     $("wps").value = SCROLL_WPS; $("wpsOut").textContent = label; $("paceOut").textContent = label;
     if (fallback){
       fallback.wps = SCROLL_WPS;
-      if (!fallback.paused) foot("moving at " + label + " · tap to pause");
+      if (!fallback.paused) foot("moving at " + label);
     }
     saveSettings();
   }
+  $("pausebtn").addEventListener("click", togglePause);
   $("slower").addEventListener("click", function(){ setPace(SCROLL_WPS - 0.2); });
   $("faster").addEventListener("click", function(){ setPace(SCROLL_WPS + 0.2); });
   $("wps").addEventListener("input", function(){
@@ -2135,12 +2197,12 @@
     var standalone = (window.navigator.standalone === true) || (window.matchMedia && window.matchMedia("(display-mode: standalone)").matches);
     return { kind:kind, phone:phone, engine:engine, w:w, h:h, tp:tp, standalone:standalone,
              origin: location.protocol + "//" + (location.host || "(local file)"),
-             build: "2026-09-21 06:02 UTC · fc1995a",
+             build: "2026-09-21 06:25 UTC · a3cf398",
              label: kind + ", in " + engine + (standalone ? ", added to the home screen" : "")
                     + " · screen " + w + "×" + h
                     + " · loaded from " + location.protocol + "//" + (location.host || "(local file)") };
   }
-  var BUILD = "2026-09-21 06:02 UTC · fc1995a";
+  var BUILD = "2026-09-21 06:25 UTC · a3cf398";
   var DEV = device();
   $("deviceLine").textContent = DEV.label + "  ·  build " + BUILD;
   var canRun = preflight();
@@ -2361,7 +2423,7 @@
     foot: function(){ return $("foot").textContent; },
     fallback: function(wps){ if (wps === false) stopFallback(); else startFallback("driven", wps || null); return !!fallback; },
     fallbackState: function(){ return fallback ? { wps: fallback.wps, paused: fallback.paused } : null; },
-    tap: tapStage,
+    tap: togglePause, tapWord: jumpToWord, wordAt: wordAtPoint,
     countdown: function(){ return { on: COUNTDOWN, counting: countingDown, seconds: COUNT_S, shown: $("stage").dataset.count === "1", n: $("count").querySelector(".n").textContent }; },
     startCountdown: function(done){ startCountdown(done || function(){}); },
     cannotListen: function(v){ if (typeof v === "boolean") cannotListen = v; return cannotListen; },
