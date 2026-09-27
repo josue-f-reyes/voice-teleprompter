@@ -21,6 +21,8 @@
 <meta property="og:title" content="Voice Teleprompter — read from your phone">
 <meta property="og:description" content="Paste a script and read it from your phone. The words follow your voice, wait at the end of every cut, and go back when you say “take that again”.">
 <meta property="og:url" content="https://prompter.rivetlabstudio.com/app/">
+<link rel="icon" href="/favicon.ico" sizes="32x32">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <meta property="og:image" content="https://prompter.rivetlabstudio.com/share.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
@@ -2197,12 +2199,12 @@
     var standalone = (window.navigator.standalone === true) || (window.matchMedia && window.matchMedia("(display-mode: standalone)").matches);
     return { kind:kind, phone:phone, engine:engine, w:w, h:h, tp:tp, standalone:standalone,
              origin: location.protocol + "//" + (location.host || "(local file)"),
-             build: "2026-09-21 06:25 UTC · a3cf398",
+             build: "2026-09-27 21:00 UTC · a3cf398",
              label: kind + ", in " + engine + (standalone ? ", added to the home screen" : "")
                     + " · screen " + w + "×" + h
                     + " · loaded from " + location.protocol + "//" + (location.host || "(local file)") };
   }
-  var BUILD = "2026-09-21 06:25 UTC · a3cf398";
+  var BUILD = "2026-09-27 21:00 UTC · a3cf398";
   var DEV = device();
   $("deviceLine").textContent = DEV.label + "  ·  build " + BUILD;
   var canRun = preflight();
