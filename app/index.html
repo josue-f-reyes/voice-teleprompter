@@ -34,7 +34,7 @@
 <meta name="apple-mobile-web-app-title" content="Voice Teleprompter">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="manifest" href="/site.webmanifest">
-<script>(function(){if(location.hostname!=="prompter.rivetlabstudio.com")return;!function(t,e){var o,n,p,r;e.__SV||(window.posthog&&window.posthog.__loaded)||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init capture register register_once unregister opt_out_capturing has_opted_out_capturing opt_in_capturing reset isFeatureEnabled getFeatureFlag onFeatureFlags identify setPersonProperties group".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);posthog.init("phc_ksMhV6qRLwDtwFxZopKynrNwJeFr9VKvaEcBN6M2ffVq",{"api_host": "https://us.i.posthog.com", "defaults": "2025-05-24", "person_profiles": "identified_only", "disable_session_recording": true, "mask_all_text": true});posthog.register({site:'voice-teleprompter'});})();</script>
+<script>(function(){if(location.hostname!=="prompter.rivetlabstudio.com")return;var q=new URLSearchParams(location.search).get('owner');if(q==='1'||q==='0'){document.cookie='rl_owner=1; Domain=rivetlabstudio.com; Path=/; SameSite=Lax; Secure; Max-Age='+(q==='1'?315360000:0);var u=new URL(location.href);u.searchParams.delete('owner');history.replaceState(null,'',u.pathname+u.search+u.hash);}var owner=/(?:^|; )rl_owner=1/.test(document.cookie);!function(t,e){var o,n,p,r;e.__SV||(window.posthog&&window.posthog.__loaded)||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init capture register register_once unregister opt_out_capturing has_opted_out_capturing opt_in_capturing reset isFeatureEnabled getFeatureFlag onFeatureFlags identify setPersonProperties group".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);posthog.init("phc_ksMhV6qRLwDtwFxZopKynrNwJeFr9VKvaEcBN6M2ffVq",{"api_host": "https://us.i.posthog.com", "defaults": "2025-05-24", "person_profiles": "identified_only", "disable_session_recording": true, "mask_all_text": true});posthog.register(owner?{site:'voice-teleprompter',adp_owner:true}:{site:'voice-teleprompter'});})();</script>
 <title>Voice Teleprompter — read from your phone</title>
 <style>
   /* The typefaces, served from this address rather than from Google (founder,
@@ -2200,12 +2200,12 @@
     var standalone = (window.navigator.standalone === true) || (window.matchMedia && window.matchMedia("(display-mode: standalone)").matches);
     return { kind:kind, phone:phone, engine:engine, w:w, h:h, tp:tp, standalone:standalone,
              origin: location.protocol + "//" + (location.host || "(local file)"),
-             build: "2026-10-27 04:28 UTC · a3cf398",
+             build: "2026-11-23 06:26 UTC · a3cf398",
              label: kind + ", in " + engine + (standalone ? ", added to the home screen" : "")
                     + " · screen " + w + "×" + h
                     + " · loaded from " + location.protocol + "//" + (location.host || "(local file)") };
   }
-  var BUILD = "2026-10-27 04:28 UTC · a3cf398";
+  var BUILD = "2026-11-23 06:26 UTC · a3cf398";
   var DEV = device();
   $("deviceLine").textContent = DEV.label + "  ·  build " + BUILD;
   var canRun = preflight();
