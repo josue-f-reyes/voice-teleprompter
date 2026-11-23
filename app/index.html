@@ -2048,10 +2048,13 @@
     try { rec.start(); } catch(e){ log("start threw: " + e.message); }
   }
 
-  $("go").addEventListener("click", function(){
-    var b = this;
+  // After the microphone is granted the start carries on by calling this
+  // again, never by clicking the button: a scripted click is a second press to
+  // anything counting presses (PostHog logged every tab's first Start twice).
+  function pressGo(){
+    var b = $("go");
     if (!wantRunning){
-      if (!micGranted && !cannotListen && !TIMED){ askMic(function(){ b.click(); }); return; }
+      if (!micGranted && !cannotListen && !TIMED){ askMic(pressGo); return; }
       m = blankMetrics(); verdictEl.textContent = "";
       wantRunning = true; b.dataset.live = "1"; b.textContent = "Stop";
       if (typeof show === "function") show("read");
@@ -2068,7 +2071,8 @@
     } else {
       stopSession("ended when you stopped");
     }
-  });
+  }
+  $("go").addEventListener("click", pressGo);
   // ONE way a session ends, whether by the button or by voice.
   var lastLayoutText = "";
   function stopSession(how){
@@ -2200,12 +2204,12 @@
     var standalone = (window.navigator.standalone === true) || (window.matchMedia && window.matchMedia("(display-mode: standalone)").matches);
     return { kind:kind, phone:phone, engine:engine, w:w, h:h, tp:tp, standalone:standalone,
              origin: location.protocol + "//" + (location.host || "(local file)"),
-             build: "2026-11-23 06:26 UTC · a3cf398",
+             build: "2026-11-23 06:52 UTC · 572b9a9",
              label: kind + ", in " + engine + (standalone ? ", added to the home screen" : "")
                     + " · screen " + w + "×" + h
                     + " · loaded from " + location.protocol + "//" + (location.host || "(local file)") };
   }
-  var BUILD = "2026-11-23 06:26 UTC · a3cf398";
+  var BUILD = "2026-11-23 06:52 UTC · 572b9a9";
   var DEV = device();
   $("deviceLine").textContent = DEV.label + "  ·  build " + BUILD;
   var canRun = preflight();
